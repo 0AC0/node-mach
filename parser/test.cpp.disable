@@ -1,0 +1,244 @@
+#include "../hpp/parser/test.hpp"
+
+#define REG_TEST(...) 											\
+switch (bytes[1]) {											\
+	/* A */												\
+	case 0x00:											\
+		switch (bytes[2]) {									\
+			/* A */										\
+			case 0x00:									\
+				p->advance();								\
+				dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")			\
+					<< "Tried to compare register to its self: A "#__VA_ARGS__ ;	\
+				return 1;								\
+				/* B */									\
+			case 0x01:									\
+				if (Registers::a() __VA_ARGS__ Registers::b()) {			\
+					Registers::flagsjump(1);					\
+				} else {								\
+					Registers::flagsjump(0);					\
+				}									\
+				dbg() << "A "#__VA_ARGS__" B? " << Registers::flagsjump();		\
+				p->advance();								\
+				p->consume();								\
+				break;									\
+				/* C */									\
+			case 0x02:									\
+				if (Registers::a() __VA_ARGS__ Registers::c()) {			\
+					Registers::flagsjump(1);					\
+				} else {								\
+					Registers::flagsjump(0);					\
+				}									\
+				dbg() << "A "#__VA_ARGS__" C? " << Registers::flagsjump();		\
+				p->advance();								\
+				p->consume();								\
+				break;									\
+				/* D */									\
+			case 0x03:									\
+				if (Registers::a() __VA_ARGS__ Registers::d()) {			\
+					Registers::flagsjump(1);					\
+				} else {								\
+					Registers::flagsjump(0);					\
+				}									\
+				dbg() << "A "#__VA_ARGS__" D? " << Registers::flagsjump();		\
+				p->advance();								\
+				p->consume();								\
+				break;									\
+			default:									\
+				p->advance();								\
+				dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")			\
+					<< "Tried to compare register to unknown register: A "#__VA_ARGS__ ;\
+				return 1;								\
+		}											\
+		p->advance();										\
+		p->consume();										\
+		break;											\
+													\
+		/* B */											\
+	case 0x01:											\
+		switch (bytes[2]) {									\
+			/* A */										\
+			case 0x00:									\
+				if (Registers::b() __VA_ARGS__ Registers::a()) {			\
+					Registers::flagsjump(1);					\
+				} else {								\
+					Registers::flagsjump(0);					\
+				}									\
+				dbg() << "B "#__VA_ARGS__" A? " << Registers::flagsjump();		\
+				p->advance();								\
+				p->consume();								\
+				break;									\
+				/* B */									\
+			case 0x01:									\
+				p->advance();								\
+				dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")			\
+					<< "Tried to compare register to its self: B "#__VA_ARGS__;	\
+				return 1;								\
+				/* C */									\
+			case 0x02:									\
+				if (Registers::b() __VA_ARGS__ Registers::c()) {			\
+					Registers::flagsjump(1);					\
+				} else {								\
+					Registers::flagsjump(0);					\
+				}									\
+				dbg() << "B "#__VA_ARGS__" C? " << Registers::flagsjump();		\
+				p->advance();								\
+				p->consume();								\
+				break;									\
+				/* D */									\
+			case 0x03:									\
+				if (Registers::b() __VA_ARGS__ Registers::d()) {			\
+					Registers::flagsjump(1);					\
+				} else {								\
+					Registers::flagsjump(0);					\
+				}									\
+				dbg() << "B "#__VA_ARGS__" D? " << Registers::flagsjump();		\
+				p->advance();								\
+				p->consume();								\
+				break;									\
+			default:									\
+				p->advance();								\
+				dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")			\
+					<< "Tried to compare register to unknown register: B "#__VA_ARGS__ ;\
+				return 1;								\
+		}											\
+		p->advance();										\
+		p->consume();										\
+		break;											\
+													\
+		/* C */											\
+	case 0x02:											\
+		switch (bytes[2]) {									\
+			/* A */										\
+			case 0x00:									\
+				if (Registers::c() __VA_ARGS__ Registers::a()) {			\
+					Registers::flagsjump(1);					\
+				} else {								\
+					Registers::flagsjump(0);					\
+				}									\
+				dbg() << "C "#__VA_ARGS__" A? " << Registers::flagsjump();		\
+				p->advance();								\
+				p->consume();								\
+				break;									\
+				/* B */									\
+			case 0x01:									\
+				if (Registers::c() __VA_ARGS__ Registers::b()) {			\
+					Registers::flagsjump(1);					\
+				} else {								\
+					Registers::flagsjump(0);					\
+				}									\
+				dbg() << "C "#__VA_ARGS__" B? " << Registers::flagsjump();		\
+				p->advance();								\
+				p->consume();								\
+				break;									\
+				/* C */									\
+			case 0x02:									\
+				p->advance();								\
+				dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")			\
+					<< "Tried to compare register to its self: C "#__VA_ARGS__;	\
+				return 1;								\
+				/* D */									\
+			case 0x03:									\
+				if (Registers::c() __VA_ARGS__ Registers::d()) {			\
+					Registers::flagsjump(1);					\
+				} else {								\
+					Registers::flagsjump(0);					\
+				}									\
+				dbg() << "C "#__VA_ARGS__" D? " << Registers::flagsjump();		\
+				p->advance();								\
+				p->consume();								\
+				break;									\
+			default:									\
+				p->advance();								\
+				dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")			\
+					<< "Tried to compare register to unknown register: C "#__VA_ARGS__ ;\
+				return 1;								\
+		}											\
+		p->advance();										\
+		p->consume();										\
+		break;											\
+													\
+		/* D */											\
+	case 0x03:											\
+		switch (bytes[2]) {									\
+			/* A */										\
+			case 0x00:									\
+				if (Registers::d() __VA_ARGS__ Registers::a()) {			\
+					Registers::flagsjump(1);					\
+				} else {								\
+					Registers::flagsjump(0);					\
+				}									\
+				dbg() << "D "#__VA_ARGS__" A? " << Registers::flagsjump();		\
+				p->advance();								\
+				p->consume();								\
+				break;									\
+				/* B */									\
+			case 0x01:									\
+				if (Registers::d() __VA_ARGS__ Registers::b()) {			\
+					Registers::flagsjump(1);					\
+				} else {								\
+					Registers::flagsjump(0);					\
+				}									\
+				dbg() << "D "#__VA_ARGS__" B? " << Registers::flagsjump();		\
+				p->advance();								\
+				p->consume();								\
+				break;									\
+				/* C */									\
+			case 0x02:									\
+				if (Registers::d() __VA_ARGS__ Registers::c()) {			\
+					Registers::flagsjump(1);					\
+				} else {								\
+					Registers::flagsjump(0);					\
+				}									\
+													\
+				dbg() << "D "#__VA_ARGS__" C? " << Registers::flagsjump();		\
+				p->advance();								\
+				p->consume();								\
+				break;									\
+				/* D */									\
+			case 0x03:									\
+				p->advance();								\
+				dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")			\
+					<< "Tried to compare register to its self: D "#__VA_ARGS__ ;	\
+				return 1;								\
+			default:									\
+				p->advance();								\
+				dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")			\
+					<< "Tried to compare register to unknown register: D "#__VA_ARGS__ ;\
+				return 1;								\
+		}											\
+		p->advance();										\
+		p->consume();										\
+		break;											\
+													\
+	default:											\
+		p->advance();										\
+		dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")					\
+			<< "Tried to compare to unknown register"#__VA_ARGS__ ;				\
+		return 1;										\
+}													\
+return 0;
+
+bool RegTest::greater(uint8_t* bytes, Parser* p) {
+	REG_TEST(>);
+}
+
+bool RegTest::lesser(uint8_t* bytes, Parser* p) {
+	REG_TEST(<);
+}
+
+bool RegTest::eq(uint8_t* bytes, Parser* p) {
+	REG_TEST(==);
+}
+
+bool RegTest::greatereq(uint8_t* bytes, Parser* p) {
+	REG_TEST(>=);
+}
+
+bool RegTest::lessereq(uint8_t* bytes, Parser* p) {
+	REG_TEST(<=);
+}
+
+bool RegTest::noteq(uint8_t* bytes, Parser* p) {
+	REG_TEST(!=);
+}

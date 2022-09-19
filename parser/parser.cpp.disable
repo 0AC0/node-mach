@@ -1,0 +1,316 @@
+#include "../hpp/parser/parser.hpp"
+
+Parser::Parser(uint8_t* memory, uint64_t mem_size) {
+	this->memory = memory;
+	this->mem_size = mem_size;
+}
+
+//TODO: check size
+bool Parser::interpret(uint8_t* bytes) {
+	switch(*bytes) {
+		// nop
+		case 0x00:
+			dbg() << "nop";
+			consume();
+			advance();
+			break;
+
+		// MOV
+
+		// mov reg, val
+		case 0x01:
+			if(RegMov::movregval(bytes, this, bytes[1], bytes[2])) return 1;
+			break;
+
+		// mov reg, [val]
+		case 0x02:
+			if(RegMov::movregmem(bytes, this, bytes[1], bytes[2])) return 1;
+			break;
+
+		// mov [val], reg
+		case 0x03:
+			if(RegMov::movmemreg(bytes, this, bytes[1], bytes[2])) return 1;
+			break;
+
+		// mov reg, reg
+		case 0x04:
+			if(RegMov::movregreg(this, bytes[1], bytes[2])) return 1;
+			break;
+
+		// swap reg, reg
+		case 0x05:
+			dbg("[2;30;1m[[0;36;2m  TODO  [30;1m][m ") << "swap reg, reg";
+			return 1;
+			break;
+
+		// MATH
+
+		// math reg, val
+		case 0x20:
+			dbg("[2;30;1m[[0;36;2m  TODO  [30;1m][m ") << "math reg, val";
+			return 1;
+			break;
+
+		// math reg, [val]
+		case 0x21:
+			dbg("[2;30;1m[[0;36;2m  TODO  [30;1m][m ") << "math reg, [val]";
+			return 1;
+			break;
+
+		// math reg, reg, reg
+		case 0x22:
+			switch (bytes[1]) {
+				case 0x00:
+					if(RegMath::addregreg(bytes, this, bytes[2], bytes[3], bytes[4])) return 1;
+					break;
+				case 0x01:
+					if(RegMath::subtractregreg(bytes, this, bytes[2], bytes[3], bytes[4])) return 1;
+					break;
+				case 0x02:
+					if(RegMath::multiplyregreg(bytes, this, bytes[2], bytes[3], bytes[4])) return 1;
+					break;
+				case 0x03:
+					if(RegMath::divideregreg(bytes, this, bytes[2], bytes[3], bytes[4])) return 1;
+					break;
+				case 0x04:
+					if(RegMath::uaddregreg(bytes, this, bytes[2], bytes[3], bytes[4])) return 1;
+					break;
+				case 0x05:
+					if(RegMath::usubtractregreg(bytes, this, bytes[2], bytes[3], bytes[4])) return 1;
+					break;
+				case 0x06:
+					if(RegMath::umultiplyregreg(bytes, this, bytes[2], bytes[3], bytes[4])) return 1;
+					break;
+				case 0x07:
+					if(RegMath::udivideregreg(bytes, this, bytes[2], bytes[3], bytes[4])) return 1;
+					break;
+				case 0x08:
+					if(RegMath::lshiftregreg(bytes, this, bytes[2], bytes[3], bytes[4])) return 1;
+					break;
+				case 0x09:
+					if(RegMath::rshiftregreg(bytes, this, bytes[2], bytes[3], bytes[4])) return 1;
+					break;
+				case 0x10:
+					if(RegMath::orregreg(bytes, this, bytes[2], bytes[3], bytes[4])) return 1;
+					break;
+				case 0x11:
+					if(RegMath::xorregreg(bytes, this, bytes[2], bytes[3], bytes[4])) return 1;
+					break;
+				case 0x12:
+					if(RegMath::andregreg(bytes, this, bytes[2], bytes[3], bytes[4])) return 1;
+					break;
+			}
+			consume();
+			advance();
+			break;
+
+		// COMPARE AND JUMP
+
+		// conditional jump
+		case 0x40:
+			dbg() << "Jump to: " << (uintmax_t)Registers::jump();
+			if (Registers::flagsjump()) {
+				Registers::ip(Registers::jump());
+				index = Registers::jump();
+			} else {
+				consume();
+				advance();
+			}
+			Registers::flagsjump(0);
+			break;
+
+		// unconditional jump
+		case 0x41:
+			dbg() << "Jump to: " << (uintmax_t)Registers::jump();
+			Registers::ip(Registers::jump());
+			index = Registers::jump();
+			break;
+
+		// greater than
+		case 0x42:
+			if(RegTest::greater(bytes, this)) return 1;
+			consume();
+			advance();
+			break;
+
+		// lesser than
+		case 0x43:
+			if(RegTest::lesser(bytes, this)) return 1;
+			consume();
+			advance();
+			break;
+
+		// equal to
+		case 0x44:
+			if(RegTest::eq(bytes, this)) return 1;
+			consume();
+			advance();
+			break;
+
+		// greater or equal
+		case 0x45:
+			if(RegTest::greatereq(bytes, this)) return 1;
+			consume();
+			advance();
+			break;
+
+		// lesser or equal
+		case 0x46:
+			if(RegTest::lessereq(bytes, this)) return 1;
+			consume();
+			advance();
+			break;
+
+		// not equal
+		case 0x47:
+			if(RegTest::noteq(bytes, this)) return 1;
+			consume();
+			advance();
+			break;
+
+		// push
+		case 0x60:
+			if (Registers::sp() >= mem_size
+				|| Registers::sp() + sizeof(uint64_t) * Registers::st() >= mem_size) {
+				dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")
+					<< "Stack overflow or bad stack pointer";
+				return 1;
+			}
+
+			switch (bytes[1]) {
+				case 0x00:
+					((uint64_t*)&memory[Registers::sp()])[Registers::st()] = Registers::a();
+					dbg() << "sp[" << Registers::st() << ']' << " = a";
+					Registers::st(Registers::st() + 1);
+					break;
+				case 0x01:
+					((uint64_t*)&memory[Registers::sp()])[Registers::st()] = Registers::b();
+					dbg() << "sp[" << Registers::st() << ']' << " = b";
+					Registers::st(Registers::st() + 1);
+					break;
+				case 0x02:
+					((uint64_t*)&memory[Registers::sp()])[Registers::st()] = Registers::c();
+					dbg() << "sp[" << Registers::st() << ']' << " = c";
+					Registers::st(Registers::st() + 1);
+					break;
+				case 0x03:
+					((uint64_t*)&memory[Registers::sp()])[Registers::st()] = Registers::d();
+					dbg() << "sp[" << Registers::st() << ']' << " = d";
+					Registers::st(Registers::st() + 1);
+					break;
+				case 0x04:
+					((uint64_t*)&memory[Registers::sp()])[Registers::st()] = Registers::jump();
+					dbg() << "sp[" << Registers::st() << ']' << " = jump";
+					Registers::st(Registers::st() + 1);
+					break;
+				case 0x06:
+					((uint64_t*)&memory[Registers::sp()])[Registers::st()] = Registers::sp();
+					dbg() << "sp[" << Registers::st() << ']' << " = sp";
+					Registers::st(Registers::st() + 1);
+					break;
+				default:
+					dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")
+						<< "Unknown register on push: " << (uintmax_t)bytes[1];
+					break;
+			}
+			consume(2);
+			advance(2);
+			break;
+
+		// pop
+		case 0x61:
+			if (Registers::sp() >= mem_size) {
+				dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")
+					<< "Bad stack pointer";
+				return 1;
+			}
+			if (Registers::st() == 0) {
+				dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")
+					<< "Stack underflow";
+				return 1;
+			}
+
+			switch (bytes[1]) {
+				case 0x00:
+					Registers::st(Registers::st() - 1);
+					Registers::a(((uint64_t*)&memory[Registers::sp()])[Registers::st()]);
+					dbg() << "a = sp[" << Registers::st() << ']';
+					break;
+				case 0x01:
+					Registers::st(Registers::st() - 1);
+					Registers::b(((uint64_t*)&memory[Registers::sp()])[Registers::st()]);
+					dbg() << "b = sp[" << Registers::st() << ']';
+					break;
+				case 0x02:
+					Registers::st(Registers::st() - 1);
+					Registers::c(((uint64_t*)&memory[Registers::sp()])[Registers::st()]);
+					dbg() << "c = sp[" << Registers::st() << ']';
+					break;
+				case 0x03:
+					Registers::st(Registers::st() - 1);
+					Registers::d(((uint64_t*)&memory[Registers::sp()])[Registers::st()]);
+					dbg() << "d = sp[" << Registers::st() << ']';
+					break;
+				case 0x04:
+					Registers::st(Registers::st() - 1);
+					Registers::jump(((uint64_t*)&memory[Registers::sp()])[Registers::st()]);
+					dbg() << "jump = sp[" << Registers::st() << ']';
+					break;
+				case 0x06:
+					Registers::st(Registers::st() - 1);
+					Registers::sp(((uint64_t*)&memory[Registers::sp()])[Registers::st()]);
+					dbg() << "sp = sp[" << Registers::st() << ']';
+					break;
+				default:
+					dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")
+						<< "Unknown register on pop: " << (uintmax_t)bytes[1];
+					break;
+			}
+			consume(2);
+			advance(2);
+			break;
+
+		default:
+			dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << "Tried to execute invalid instruction "
+				<< (uintmax_t)*bytes << " at "
+				<< (uintmax_t)Registers::ip();
+			return 1;
+
+	}
+	return 0;
+}
+
+bool Parser::parse() {
+	while (index < mem_size) {
+		if (interpret(&memory[index])) {
+			dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << "Last ip: " << Registers::ip();
+			dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << "a: " << Registers::a();
+			dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << "b: " << Registers::b();
+			dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << "c: " << Registers::c();
+			dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << "d: " << Registers::d();
+			dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << "jump: " << Registers::jump();
+			dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << "sp: " << Registers::sp();
+			dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << " L top: " << Registers::st();
+			dbg* d = new dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ");
+			*d << "Memory dump: " << '\n';
+				for (uint64_t i = 1; i < mem_size + 1; i++) {
+					if (i - 1 < 0x10)
+					*d << "[0" << (uintmax_t)i - 1 << ']';
+					else
+					*d << '[' << (uintmax_t)i - 1 << ']';
+
+					if (memory[i - 1] < 0x10)
+					*d << '0' << (uintmax_t)memory[i - 1] << ' ';
+					else
+					*d << (uintmax_t)memory[i - 1] << ' ';
+
+					if (i % 8 == 0) {
+						*d << '\n';
+					}
+				}
+			d->~dbg();
+		       	return 1;
+		}
+	}
+	return 0;
+}

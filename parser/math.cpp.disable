@@ -1,0 +1,218 @@
+#include "../hpp/parser/math.hpp"
+
+#define REGREGREG(rega, regb, sign)						\
+switch (reg3) {									\
+	case 0x00:								\
+		Registers::a(Registers:: rega () sign Registers:: regb ());	\
+		dbg() << #rega << ' ' << #sign << ' ' << #regb 			\
+			<< " = a(" << (uintmax_t)Registers::a() << ')';		\
+		p->consume();							\
+		p->advance();							\
+		break;								\
+	case 0x01:								\
+		Registers::b(Registers:: rega () sign Registers:: regb ());	\
+		dbg() << #rega << ' ' << #sign << ' ' << #regb 			\
+			<< " = b(" << (uintmax_t)Registers::b() << ')';		\
+		p->consume();							\
+		p->advance();							\
+		break;								\
+	case 0x02:								\
+		Registers::c(Registers:: rega () sign Registers:: regb ());	\
+		dbg() << #rega << ' ' << #sign << ' ' << #regb 			\
+			<< " = c(" << (uintmax_t)Registers::c() << ')';		\
+		p->consume();							\
+		p->advance();							\
+		break;								\
+	case 0x03: {								\
+		Registers::d(Registers:: rega () sign Registers:: regb ());	\
+		dbg() << #rega << ' ' << #sign << ' ' << #regb 			\
+			<< " = d(" << (uintmax_t)Registers::d() << ')';		\
+		p->consume();							\
+		p->advance();							\
+		break;								\
+	}									\
+	default: 								\
+		dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")		\
+			<< "Unknown reg on uadd reg, reg, reg: " << (uintmax_t)reg3;\
+		return 1;							\
+}
+
+#define SREGREGREG(rega, regb, sign)						\
+switch (reg3) {									\
+	case 0x00:								\
+		Registers::a(((int64_t)Registers:: rega ()) sign ((int64_t)Registers:: regb ()));\
+		dbg() << #rega << ' ' << #sign << ' ' << #regb 			\
+			<< " = a(" << (intmax_t)Registers::a() << ')';		\
+		p->consume();							\
+		p->advance();							\
+		break;								\
+	case 0x01:								\
+		Registers::b(((int64_t)Registers:: rega ()) sign ((int64_t)Registers:: regb ()));	\
+		dbg() << #rega << ' ' << #sign << ' ' << #regb 			\
+			<< " = b(" << (intmax_t)Registers::b() << ')';		\
+		p->consume();							\
+		p->advance();							\
+		break;								\
+	case 0x02:								\
+		Registers::c(((int64_t)Registers:: rega ()) sign ((int64_t)Registers:: regb ()));	\
+		dbg() << #rega << ' ' << #sign << ' ' << #regb 			\
+			<< " = c(" << (intmax_t)Registers::c() << ')';		\
+		p->consume();							\
+		p->advance();							\
+		break;								\
+	case 0x03: {								\
+		Registers::d(((int64_t)Registers:: rega ()) sign ((int64_t)Registers:: regb ()));	\
+		dbg() << #rega << ' ' << #sign << ' ' << #regb 			\
+			<< " = d(" << (intmax_t)Registers::d() << ')';		\
+		p->consume();							\
+		p->advance();							\
+		break;								\
+	}									\
+	default: 								\
+		dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")		\
+			<< "Unknown reg on uadd reg, reg, reg: " << (uintmax_t)reg3;\
+		return 1;							\
+}
+
+#define REGREG(reg, sign, func)							\
+switch (reg2) {									\
+	case 0x00:								\
+		func(a, reg, sign)						\
+		p->consume();							\
+		p->advance();							\
+		break;								\
+	case 0x01:								\
+		func(b, reg, sign)						\
+		p->consume();							\
+		p->advance();							\
+		break;								\
+	case 0x02:								\
+		func(c, reg, sign)						\
+		p->consume();							\
+		p->advance();							\
+		break;								\
+	case 0x03: {								\
+		func(d, reg, sign)						\
+		p->consume();							\
+		p->advance();							\
+		break;								\
+	}									\
+	default: 								\
+		dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")		\
+			<< "Unknown reg on uadd reg, reg: " << (uintmax_t)reg2;	\
+		return 1;							\
+}
+
+#define SREG(sign)							\
+	switch (reg1) {							\
+	case 0x00:							\
+		REGREG(a, sign, SREGREGREG);				\
+		p->consume();						\
+		p->advance();						\
+		break;							\
+	case 0x01:							\
+		REGREG(b, sign, SREGREGREG);				\
+		p->consume();						\
+		p->advance();						\
+		break;							\
+	case 0x02:							\
+		REGREG(c, sign, SREGREGREG);				\
+		p->consume();						\
+		p->advance();						\
+		break;							\
+	case 0x03:							\
+		REGREG(d, sign, SREGREGREG);				\
+		p->consume();						\
+		p->advance();						\
+		break;							\
+	default:							\
+		dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")	\
+			<< "Unknown register on uadd reg: " << (uintmax_t)bytes[1];\
+		return 1;						\
+}									\
+p->consume(); 								\
+p->advance();								\
+return 0;								\
+
+#define REG(sign)							\
+	switch (reg1) {							\
+	case 0x00:							\
+		REGREG(a, sign, REGREGREG);				\
+		p->consume();						\
+		p->advance();						\
+		break;							\
+	case 0x01:							\
+		REGREG(b, sign, REGREGREG);				\
+		p->consume();						\
+		p->advance();						\
+		break;							\
+	case 0x02:							\
+		REGREG(c, sign, REGREGREG);				\
+		p->consume();						\
+		p->advance();						\
+		break;							\
+	case 0x03:							\
+		REGREG(d, sign, REGREGREG);				\
+		p->consume();						\
+		p->advance();						\
+		break;							\
+	default:							\
+		dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ")	\
+			<< "Unknown register on uadd reg: " << (uintmax_t)bytes[1];\
+		return 1;						\
+}									\
+p->consume(); 								\
+p->advance();								\
+return 0;								\
+
+bool RegMath::addregreg(uint8_t* bytes, Parser* p, uint8_t reg1, uint8_t reg2, uint8_t reg3) {
+	SREG(+)
+}
+
+bool RegMath::subtractregreg(uint8_t* bytes, Parser* p, uint8_t reg1, uint8_t reg2, uint8_t reg3) {
+	SREG(-)
+}
+
+bool RegMath::multiplyregreg(uint8_t* bytes, Parser* p, uint8_t reg1, uint8_t reg2, uint8_t reg3) {
+	SREG(*)
+}
+
+bool RegMath::divideregreg(uint8_t* bytes, Parser* p, uint8_t reg1, uint8_t reg2, uint8_t reg3) {
+	SREG(/)
+}
+
+bool RegMath::uaddregreg(uint8_t* bytes, Parser* p, uint8_t reg1, uint8_t reg2, uint8_t reg3) {
+	REG(+)
+}
+
+bool RegMath::usubtractregreg(uint8_t* bytes, Parser* p, uint8_t reg1, uint8_t reg2, uint8_t reg3) {
+	REG(-)
+}
+
+bool RegMath::umultiplyregreg(uint8_t* bytes, Parser* p, uint8_t reg1, uint8_t reg2, uint8_t reg3) {
+	REG(*)
+}
+
+bool RegMath::udivideregreg(uint8_t* bytes, Parser* p, uint8_t reg1, uint8_t reg2, uint8_t reg3) {
+	REG(/)
+}
+
+bool RegMath::lshiftregreg(uint8_t* bytes, Parser* p, uint8_t reg1, uint8_t reg2, uint8_t reg3) {
+	REG(<<)
+}
+
+bool RegMath::rshiftregreg(uint8_t* bytes, Parser* p, uint8_t reg1, uint8_t reg2, uint8_t reg3) {
+	REG(>>)
+}
+
+bool RegMath::orregreg(uint8_t* bytes, Parser* p, uint8_t reg1, uint8_t reg2, uint8_t reg3) {
+	REG(|)
+}
+
+bool RegMath::xorregreg(uint8_t* bytes, Parser* p, uint8_t reg1, uint8_t reg2, uint8_t reg3) {
+	REG(^)
+}
+
+bool RegMath::andregreg(uint8_t* bytes, Parser* p, uint8_t reg1, uint8_t reg2, uint8_t reg3) {
+	REG(&)
+}
