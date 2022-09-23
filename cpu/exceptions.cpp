@@ -31,7 +31,7 @@ void CPU::exception_return() {
 					    stat->mpp = Mode::User;
 
 					    regs.pc = csrs.get_csr(0x341); //mepc
-					    index = regs.pc / 4;
+					    index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
 					    return;
 				    }
 		default:

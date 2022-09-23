@@ -5,8 +5,11 @@
 class Memory {
 	public:
 		static constexpr uint32_t MB = 1 * 0x100000;
-		static constexpr uint32_t MEM_SIZE = 1 * MB;
+		static constexpr uint32_t MEM_SIZE = 16 * MB;
+		static constexpr uint32_t MEM_START = 0x80000000;
 	private:
+		template <typename T> T readT(uint64_t addr);
+		template <typename T> void writeT(uint64_t addr, T value);
 		uint8_t mem[MEM_SIZE];
 	public:
 		void write8(uint64_t addr, uint8_t value);

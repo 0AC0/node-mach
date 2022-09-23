@@ -8,7 +8,7 @@ bool CPU::parse(uint64_t entry) {
 	index = entry;
 	regs.pc = index;
 	dbg() << "Starting hart at entry point: " << regs.pc;
-	while (index < Memory::MEM_SIZE) {
+	while (index < Memory::MEM_SIZE + Memory::MEM_START) {
 		csrs.set_csr(0xC00, csrs.get_csr(0xC00) + 1);
 		csrs.set_csr(0xB00, csrs.get_csr(0xB00) + 1);
 		if (interpret((memory->read_instruction(index)))) {

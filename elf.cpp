@@ -72,7 +72,7 @@ uint64_t ELF::load(Memory* mem) {
 	for (uint64_t i = 0; i < e_phnum; i++) {
 		if (phdr[i].p_type == 1) {
 			for (uint64_t j = 0; j < phdr[i].p_filesz; j++) {
-					mem->write8(j, *(uint8_t*)(((uint8_t*)this) + j + phdr[i].p_offset));
+					mem->write8(j + Memory::MEM_START, *(uint8_t*)(((uint8_t*)this) + j + phdr[i].p_offset));
 			}
 			dbg() << "type " << phdr[i].p_type  ;
 			dbg() << "flags " << phdr[i].p_flags ;
