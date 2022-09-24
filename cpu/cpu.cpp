@@ -1,5 +1,32 @@
 #include "../hpp/cpu/cpu.hpp"
 
+std::atomic<bool> CPU::running = 0;
+std::atomic<bool> CPU::stopping = 0;
+
+bool CPU::run(CPU* c, uint64_t entry) {
+	running = 1;
+	while (!stopping) {
+		if (running) {
+			if (c->parse(entry)) return 1;
+		} else {
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+		}
+	}
+	return 0;
+}
+
+void CPU::pause() {
+	running = 0;
+}
+
+void CPU::resume() {
+	running = 1;
+}
+
+void CPU::stop() {
+	stopping = 1;
+}
+
 CPU::CPU(Memory* memory) {
 	this->memory = memory;
 }

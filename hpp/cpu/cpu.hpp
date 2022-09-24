@@ -1,12 +1,12 @@
 #pragma once
 #include <stdint.h>
+#include <atomic>
+#include <thread>
+#include <chrono>
 #include "../dbg/dbg.hpp"
 #include "registers.hpp"
 #include "instruction.hpp"
 #include "../memory/memory.hpp"
-//#include "test.hpp"
-//#include "mov.hpp"
-//#include "math.hpp"
 
 class CPU {
 	private:
@@ -16,13 +16,17 @@ class CPU {
 			ECall_Machine_Mode	 = 11,
 		};
 		enum Mode {
-			User		 = 0,
-			Supervisor	 = 1,
-			Hypervisor	 = 2,
-			Machine		 = 3,
+			User			 = 0,
+			Supervisor		 = 1,
+			Hypervisor		 = 2,
+			Machine			 = 3,
 		};
+
 		uint8_t mode = Mode::Machine;
 		uint64_t index = 0;
+		static std::atomic<bool> running;
+		static std::atomic<bool> stopping;
+
 		bool interpret(uint32_t* bytes);
 		void exception(Exception ex);
 		void exception_return();
@@ -38,4 +42,10 @@ class CPU {
 		uint32_t consume(uint64_t offset) { index += offset; regs.pc += offset; return memory->read32(index); }
 
 		bool parse(uint64_t entry);
+
+		static bool run(CPU* c, uint64_t entry);
+		static void pause();
+		static void resume();
+		static void stop();
 };
+
