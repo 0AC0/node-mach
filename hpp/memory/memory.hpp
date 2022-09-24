@@ -5,7 +5,7 @@
 class Memory {
 	public:
 		static constexpr uint32_t MB = 1 * 0x100000;
-		static constexpr uint32_t MEM_SIZE = 16 * MB;
+		static constexpr uint32_t MEM_SIZE = 132 * MB;
 		static constexpr uint32_t MEM_START = 0x80000000;
 	private:
 		template <typename T> T readT(uint64_t addr);
