@@ -9,7 +9,7 @@ NodeMach, the RISC-V 64 virtual environment for NodeNet
 ### NodeMach?
 NodeMach is a virtual environment standard for running the operating system NodeNet. 
 It acts as a layer between devices, like the CPU or the network adapter, that translates the access protocols into simpler, more versatile versions.
-It is enetially a RISC-V emulator virtual machine used for running NodeNet.
+It is essentially a RISC-V emulator virtual machine used for running NodeNet.
 
 ### NodeNet?
 A network based operating system based on the idea that everything is a node and can be connected to another node provided the nodes are compatible. (ex. /path/to/image -> /path/to/framebuffer)
