@@ -33,7 +33,7 @@ run:
 	@build/machine.bin build/payload.elf
 
 test:
-	#riscv64-unknown-elf-g++ -ffreestanding -MD -fno-omit-frame-pointer -gdwarf-2 -march=rv64imad -fno-common -nostdlib -mno-relax -T ../machine-tests/common.ld ../machine-tests/test.cpp -o build/payload.elf
+	riscv64-unknown-elf-g++ -ffreestanding -MD -fno-omit-frame-pointer -gdwarf-2 -march=rv64imad -fno-common -nostdlib -mno-relax -T ../machine-tests/common.ld ../machine-tests/test.cpp -o build/payload.elf
 	riscv64-unknown-elf-objdump -S build/payload.elf > build/payload.asm
 	
 
