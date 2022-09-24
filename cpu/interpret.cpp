@@ -1,12 +1,12 @@
 #include "../hpp/cpu/cpu.hpp"
 
-constexpr bool DBG_LOAD  = 1;
-constexpr bool DBG_STORE = 1;
-constexpr bool DBG_JUMP  = 1;
-constexpr bool DBG_COMP  = 1;
-constexpr bool DBG_MATH  = 1;
-constexpr bool DBG_AMO   = 1;
-constexpr bool DBG_CSR   = 1;
+constexpr bool DBG_LOAD  = 0;
+constexpr bool DBG_STORE = 0;
+constexpr bool DBG_JUMP  = 0;
+constexpr bool DBG_COMP  = 0;
+constexpr bool DBG_MATH  = 0;
+constexpr bool DBG_AMO   = 0;
+constexpr bool DBG_CSR   = 0;
 
 int64_t sign_extend8(uint8_t i) {
 	int64_t j;
@@ -293,7 +293,7 @@ bool CPU::interpret(uint32_t* bytes) {
 					if constexpr (DBG_STORE)
 					dbg() << "sb " << sign_extend12((((Stype*)bytes)->imm2 << 5)
 							| ((Stype*)bytes)->imm1) + regs.x[((Stype*)bytes)->rs1] << " = "
-						<< regs.x[((Stype*)bytes)->rs2];
+						<< ((Stype*)bytes)->rs2 << '(' << regs.x[((Stype*)bytes)->rs2] << ')';
 					memory->write8(regs.x[((Stype*)bytes)->rs1] 
 							+ sign_extend12((((Stype*)bytes)->imm2 << 5)
 							| ((Stype*)bytes)->imm1)
@@ -516,6 +516,102 @@ bool CPU::interpret(uint32_t* bytes) {
 			dbg() << "lui x[" << ((Utype*)bytes)->rd << "] = "
 				<< sign_extend32(((Utype*)bytes)->imm << 12);
 			regs.x[((Utype*)bytes)->rd] = sign_extend32(((Utype*)bytes)->imm << 12);
+			consume();
+			break;
+		case 0xE:
+			// TODO: Technically these aren't right
+			switch (((Rtype*)bytes)->funct3) {
+				case 0b000:
+					switch (((Rtype*)bytes)->funct7) {
+						case 0b0000000:
+							if constexpr (DBG_MATH)
+							dbg() << "addw x[" <<((Rtype*)bytes)->rd
+								<< "] = x[" << ((Rtype*)bytes)->rs1
+								<< "](" << regs.x[((Rtype*)bytes)->rs1]
+								<< ") + x[" << ((Rtype*)bytes)->rs2
+								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
+							regs.x[((Rtype*)bytes)->rd]
+								= sign_extend32(regs.x[((Rtype*)bytes)->rs1]
+								+ regs.x[((Rtype*)bytes)->rs2]);
+							break;
+						case 0b0100000:
+							if constexpr (DBG_MATH)
+							dbg() << "subw x[" <<((Rtype*)bytes)->rd
+								<< "] = x[" << ((Rtype*)bytes)->rs1
+								<< "](" << regs.x[((Rtype*)bytes)->rs1]
+								<< ") - x[" << ((Rtype*)bytes)->rs2
+								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
+							regs.x[((Rtype*)bytes)->rd]
+								= sign_extend32(regs.x[((Rtype*)bytes)->rs1]
+								- regs.x[((Rtype*)bytes)->rs2]);
+							break;
+						case 0b0000001:
+							if constexpr (DBG_MATH)
+							dbg() << "mulw x[" <<((Rtype*)bytes)->rd
+								<< "] = x[" << ((Rtype*)bytes)->rs1
+								<< "](" << regs.x[((Rtype*)bytes)->rs1]
+								<< ") * x[" << ((Rtype*)bytes)->rs2
+								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
+							regs.x[((Rtype*)bytes)->rd]
+								= sign_extend32((int32_t)regs.x[((Rtype*)bytes)->rs1]
+								* (int32_t)regs.x[((Rtype*)bytes)->rs2]);
+							break;
+						default:
+							exception(Exception::Illegal_Instruction);
+							return 1;
+					}
+					break;
+				case 0b001:
+					if constexpr (DBG_MATH)
+					dbg() << "sllw x[" <<((Rtype*)bytes)->rd
+						<< "] = x[" << ((Rtype*)bytes)->rs1
+						<< "](" << regs.x[((Rtype*)bytes)->rs1]
+						<< ") << x[" << ((Rtype*)bytes)->rs2
+						<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
+					regs.x[((Rtype*)bytes)->rd]
+						= sign_extend32(regs.x[((Rtype*)bytes)->rs1]
+						<< regs.x[((Rtype*)bytes)->rs2]);
+					break;
+				case 0b101:
+					switch (((Rtype*)bytes)->funct7) {
+						case 0b0000000:
+							if constexpr (DBG_MATH)
+							dbg() << "srlw x[" <<((Rtype*)bytes)->rd
+								<< "] = x[" << ((Rtype*)bytes)->rs1
+								<< "](" << regs.x[((Rtype*)bytes)->rs1]
+								<< ") >>l x[" << ((Rtype*)bytes)->rs2
+								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
+							regs.x[((Rtype*)bytes)->rd]
+								= sign_extend32(regs.x[((Rtype*)bytes)->rs1]
+								>> regs.x[((Rtype*)bytes)->rs2]);
+							break;
+						case 0b0100000:
+							if constexpr (DBG_MATH)
+							dbg() << "sraw x[" <<((Rtype*)bytes)->rd
+								<< "] = x[" << ((Rtype*)bytes)->rs1
+								<< "](" << regs.x[((Rtype*)bytes)->rs1]
+								<< ") >>a x[" << ((Rtype*)bytes)->rs2
+								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
+							regs.x[((Rtype*)bytes)->rd]
+								= sign_extend32(arithmetic_right_shift(regs.x[((Rtype*)bytes)->rs1]
+										,regs.x[((Rtype*)bytes)->rs2]));
+							break;
+						case 0b0000001:
+							if constexpr (DBG_MATH)
+							dbg() << "divuw x[" <<((Rtype*)bytes)->rd
+								<< "] = x[" << ((Rtype*)bytes)->rs1
+								<< "](" << regs.x[((Rtype*)bytes)->rs1]
+								<< ") * x[" << ((Rtype*)bytes)->rs2
+								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
+							regs.x[((Rtype*)bytes)->rd]
+								= sign_extend32((uint32_t)regs.x[((Rtype*)bytes)->rs1]
+								/ (uint32_t)regs.x[((Rtype*)bytes)->rs2]);
+							break;
+						default:
+							exception(Exception::Illegal_Instruction);
+							return 1;
+					}
+			}
 			consume();
 			break;
 		case 0x18: {
