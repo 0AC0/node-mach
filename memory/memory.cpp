@@ -3,7 +3,7 @@
 template <typename T>
 void Memory::writeT(uint64_t addr, T value) {
 	switch (addr) {
-		case MEM_START ... MEM_START + MEM_SIZE:
+		case MEM_START ... MEM_START + MEM_SIZE - 1:
 			*(T*)&(mem[addr - MEM_START]) = value;
 			return;
 		case 0xc0000000:
@@ -41,7 +41,7 @@ void Memory::write64(uint64_t addr, uint64_t value) {
 template <typename T>
 T Memory::readT(uint64_t addr) {
 	switch (addr) {
-		case MEM_START ... MEM_START + MEM_SIZE:
+		case MEM_START ... MEM_START + MEM_SIZE - 1:
 			return *(T*)&(mem[addr - MEM_START]);
 		// UART HACK
 		case 0x10000000 + 5:
