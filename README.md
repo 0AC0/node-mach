@@ -1,8 +1,5 @@
 ![RISC-V](https://riscv.org/wp-content/uploads/2020/06/riscv-color.svg)
 
-## This repo is part of the NodeNet project
-Official NodeNet website: [NodeNet.work](http://nodenet.work)
-
 # NodeMach
 NodeMach, the RISC-V 64 virtual environment for NodeNet
 
@@ -34,6 +31,7 @@ A network based operating system based on the idea that everything is a node and
  - Bare bones CSR support
 
 </p>
+
 <details><summary>Building</summary>
 
 Dependencies: `clang, make`
@@ -54,3 +52,22 @@ make run-update
 ```
 
 </details>
+
+<details><summary>Debugging</summary>
+
+| Command | Description |
+| --- | --- |
+| show | Show command buffer(used for debugging of the debugger) |
+| step | Step one CPU cycle |
+| stepto <addr> | Run the CPU until the program counter is equal to <addr> |
+| read32 <addr> | Read 4x 32bit values from <addr> |
+| read64 <addr> | Read 4x 64bit values from <addr> |
+| ls | List CPU registers |
+| resume | Exit debugger, continuing to run the payload |
+| exit | Exit the debugger, exiting the program |
+
+</details>
+
+
+## This repo is part of the NodeNet project
+Official NodeNet website: [NodeNet.work](http://nodenet.work)
