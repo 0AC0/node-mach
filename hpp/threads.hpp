@@ -8,12 +8,13 @@
 class Threads {
 	private:
 		static Threads* t;
+	public:
 		struct CPUEntry {
 			CPU* cpu;
 			std::thread* thread;
 		};
 		std::vector<CPUEntry> cpus;
-	public:
+
 		static void start_all_cpus(Memory* m, uint64_t entry);
 		static void join_all_cpus();
 		static void pause_all_cpus();
