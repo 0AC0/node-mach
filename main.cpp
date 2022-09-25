@@ -2,22 +2,13 @@
 #include <fstream>
 #include <filesystem>
 #include <thread>
-//#include <chrono>
+#include <signal.h>
 
 #include "hpp/dbg/dbg.hpp"
+#include "hpp/dbg/debugger.hpp"
 #include "hpp/cpu/cpu.hpp"
 #include "hpp/elf.hpp"
-
-//std::this_thread::sleep_for(std::chrono::seconds(1));
-
-bool hart(CPU* c, uint64_t entry) {
-	if(c->parse(entry)) {
-		dbg("[2;30;1m[[0;31;2m  STOP  [30;1m][m ") << " ----------- ";
-		return 1;
-	} else
-		dbg("[2;30;1m[[0;32;2m  STOP  [30;1m][m ") << " ----------- ";
-	return 0;
-}
+#include "hpp/threads.hpp"
 
 
 int main(int, char* argv[]) {
@@ -46,17 +37,20 @@ int main(int, char* argv[]) {
 
 	dbg() << "Allocating hart0 resources";
 	CPU* c = new CPU(memory);
-	dbg::regs = &c->regs;
-	dbg() << "Initializing hart0";
+	dbg::regs = &c->regs; // TODO: fix this
+
+	dbg() << "Initializing debugger";
+	debugger();
+
 	// Check registers.cpp for read only registers
 	//              I = standard isa; S = supervisor; U = usermode
 	//              misa     10 = 64 bit                            ABCDEFGHIJKLMNOPQRSTUVWXZ
 	//c->csrs.set_csr(0x301, 0b1000000000000000000000000000000000000000000000010000000001010000, 1);
 
-	dbg("[2;30;1m[[0;32;2m  START [30;1m][m ") << "Hart 0 stating up... ";
-	std::thread hart0(hart, c, entry);
+	dbg() << "Starting CPU threads";
+	Threads::start_all_cpus(memory, entry);
 
-	hart0.join();
+	Threads::join_all_cpus();
 
 	return 0;
 }

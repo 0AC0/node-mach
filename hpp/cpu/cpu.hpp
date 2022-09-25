@@ -8,6 +8,7 @@
 #include "instruction.hpp"
 #include "../memory/memory.hpp"
 
+
 class CPU {
 	private:
 		enum Exception {
@@ -25,7 +26,6 @@ class CPU {
 		uint8_t mode = Mode::Machine;
 		uint64_t index = 0;
 		static std::atomic<bool> running;
-		static std::atomic<bool> stopping;
 
 		bool interpret(uint32_t* bytes);
 		void exception(Exception ex);
@@ -41,6 +41,7 @@ class CPU {
 		uint32_t consume() { index++; regs.pc += sizeof(uint32_t); return memory->read32(index); }
 		uint32_t consume(uint64_t offset) { index += offset; regs.pc += offset; return memory->read32(index); }
 
+		bool step() { return interpret((memory->read_instruction(index))); }
 		bool parse(uint64_t entry);
 
 		static bool run(CPU* c, uint64_t entry);
