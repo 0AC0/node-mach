@@ -1,6 +1,6 @@
 #include "../hpp/cpu/cpu.hpp"
 
-std::atomic<bool> CPU::running = 0;
+//std::atomic<bool> CPU::running = 0;
 
 bool CPU::run(CPU* c, uint64_t entry) {
 	if (c->parse(entry)) return 1;

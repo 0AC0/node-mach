@@ -19,13 +19,13 @@ class CPU {
 		enum Mode {
 			User			 = 0,
 			Supervisor		 = 1,
-			Hypervisor		 = 2,
+			//Hypervisor		 = 2, // Unimplemented
 			Machine			 = 3,
 		};
 
 		uint8_t mode = Mode::Machine;
 		uint64_t index = 0;
-		static std::atomic<bool> running;
+		std::atomic<bool> running = 1;
 
 		bool interpret(uint32_t* bytes);
 		void exception(Exception ex);
@@ -45,8 +45,7 @@ class CPU {
 		bool parse(uint64_t entry);
 
 		static bool run(CPU* c, uint64_t entry);
-		static void pause();
-		static void resume();
-		static void stop();
+		void pause();
+		void resume();
 };
 
