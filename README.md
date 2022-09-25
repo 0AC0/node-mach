@@ -55,6 +55,8 @@ make run-update
 
 <details><summary>Debugging</summary>
 
+^C (Ctrl + C) or send the process a SIGINT to pull up the debugger.
+
 | Command | Description |
 | --- | --- |
 | show | Show command buffer(used for debugging of the debugger) |
