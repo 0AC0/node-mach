@@ -61,9 +61,9 @@ make run-update
 | --- | --- |
 | show | Show command buffer(used for debugging of the debugger) |
 | step | Step one CPU cycle |
-| stepto <addr> | Run the CPU until the program counter is equal to <addr> |
-| read32 <addr> | Read 4x 32bit values from <addr> |
-| read64 <addr> | Read 4x 64bit values from <addr> |
+| stepto \<addr\> | Run the CPU until the program counter is equal to \<addr\> |
+| read32 \<addr\> | Read 4x 32bit values from \<addr\> |
+| read64 \<addr\> | Read 4x 64bit values from \<addr\> |
 | ls | List CPU registers |
 | resume | Exit debugger, continuing to run the payload |
 | exit | Exit the debugger, exiting the program |
