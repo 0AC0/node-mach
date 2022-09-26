@@ -1,12 +1,12 @@
 #include "../hpp/cpu/cpu.hpp"
 
-constexpr bool DBG_LOAD  = 0;
-constexpr bool DBG_STORE = 0;
-constexpr bool DBG_JUMP  = 0;
-constexpr bool DBG_COMP  = 0;
-constexpr bool DBG_MATH  = 0;
-constexpr bool DBG_AMO   = 0;
-constexpr bool DBG_CSR   = 0;
+constexpr bool DBG_LOAD  = 1;
+constexpr bool DBG_STORE = 1;
+constexpr bool DBG_JUMP  = 1;
+constexpr bool DBG_COMP  = 1;
+constexpr bool DBG_MATH  = 1;
+constexpr bool DBG_AMO   = 1;
+constexpr bool DBG_CSR   = 1;
 
 int64_t sign_extend8(uint8_t i) {
 	int64_t j;
@@ -483,6 +483,7 @@ bool CPU::interpret(uint32_t* bytes) {
 							exception(Exception::Illegal_Instruction);
 							return 1;
 					}
+					break;
 				case 0b110:
 					if constexpr (DBG_MATH)
 					dbg() << "or x[" <<((Rtype*)bytes)->rd
@@ -611,6 +612,9 @@ bool CPU::interpret(uint32_t* bytes) {
 							exception(Exception::Illegal_Instruction);
 							return 1;
 					}
+				default:
+					exception(Exception::Illegal_Instruction);
+					return 1;
 			}
 			consume();
 			break;
@@ -732,6 +736,9 @@ bool CPU::interpret(uint32_t* bytes) {
 						consume();
 					}
 					break;
+				default:
+					exception(Exception::Illegal_Instruction);
+					return 1;
 			}
 			break;
 			   }
