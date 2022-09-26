@@ -1,13 +1,5 @@
 #include "../hpp/cpu/cpu.hpp"
 
-constexpr bool DBG_LOAD  = 1;
-constexpr bool DBG_STORE = 1;
-constexpr bool DBG_JUMP  = 1;
-constexpr bool DBG_COMP  = 1;
-constexpr bool DBG_MATH  = 1;
-constexpr bool DBG_AMO   = 1;
-constexpr bool DBG_CSR   = 1;
-
 int64_t sign_extend8(uint8_t i) {
 	int64_t j;
 	if (i & 0x80)
@@ -136,6 +128,7 @@ bool CPU::interpret(uint32_t* bytes) {
 			consume();
 			break;
 		case 0x3:
+			if constexpr (DBG_FENCE)
 			dbg() << "Fence/Fence.i";
 			//Uninplemented? This VM doesn't have any memory cache
 			consume();

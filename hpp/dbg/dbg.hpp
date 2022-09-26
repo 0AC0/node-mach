@@ -4,6 +4,15 @@
 #include <stdint.h>
 #include "../cpu/registers.hpp"
 
+constexpr bool DBG_LOAD  = 0;
+constexpr bool DBG_STORE = 0;
+constexpr bool DBG_JUMP  = 0;
+constexpr bool DBG_COMP  = 0;
+constexpr bool DBG_MATH  = 0;
+constexpr bool DBG_AMO   = 0;
+constexpr bool DBG_CSR   = 0;
+constexpr bool DBG_FENCE = 0;
+
 class Regs;
 
 class dbg {
