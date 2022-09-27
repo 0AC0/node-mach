@@ -790,8 +790,8 @@ bool CPU::interpret(uint32_t* bytes) {
 						    csrs.set_csr(((Itype*)bytes)->imm, regs.x[((Itype*)bytes)->rs1]);
 						    regs.x[((Itype*)bytes)->rd] = t;
 						    if constexpr (DBG_CSR)
-						    dbg() << "csrrw csr[" << regs.x[((Itype*)bytes)->imm]
-							    << "] = " << csrs.get_csr(((Itype*)bytes)->rd)
+						    dbg() << "csrrw csr[" << ((Itype*)bytes)->imm
+							    << "] = " << csrs.get_csr(((Itype*)bytes)->imm)
 							    << " with rd = " << ((Itype*)bytes)->rd;
 						    consume();
 						    break;
@@ -802,8 +802,8 @@ bool CPU::interpret(uint32_t* bytes) {
 						    csrs.set_csr(((Itype*)bytes)->imm, t | regs.x[((Itype*)bytes)->rs1]);
 						    regs.x[((Itype*)bytes)->rd] = t;
 						    if constexpr (DBG_CSR)
-						    dbg() << "csrrs csr[" << regs.x[((Itype*)bytes)->imm]
-							    << "] = " << csrs.get_csr(((Itype*)bytes)->rd)
+						    dbg() << "csrrs csr[" << ((Itype*)bytes)->imm
+							    << "] = " << csrs.get_csr(((Itype*)bytes)->imm)
 							    << " with rd = " << ((Itype*)bytes)->rd;
 						    consume();
 						    break;
@@ -814,8 +814,8 @@ bool CPU::interpret(uint32_t* bytes) {
 						    csrs.set_csr(((Itype*)bytes)->imm, t & ~regs.x[((Itype*)bytes)->rs1]);
 						    regs.x[((Itype*)bytes)->rd] = t;
 						    if constexpr (DBG_CSR)
-						    dbg() << "csrrc csr[" << regs.x[((Itype*)bytes)->imm]
-							    << "] = " << csrs.get_csr(((Itype*)bytes)->rd)
+						    dbg() << "csrrc csr[" << ((Itype*)bytes)->imm
+							    << "] = " << csrs.get_csr(((Itype*)bytes)->imm)
 							    << " with rd = " << ((Itype*)bytes)->rd;
 						    consume();
 						    break;
@@ -825,8 +825,8 @@ bool CPU::interpret(uint32_t* bytes) {
 						    csrs.set_csr(((Itype*)bytes)->imm, (uint64_t)((Itype*)bytes)->rs1);
 						    regs.x[((Itype*)bytes)->rd] = csrs.get_csr(((Itype*)bytes)->imm);
 						    if constexpr (DBG_CSR)
-						    dbg() << "csrrwi csr[" << regs.x[((Itype*)bytes)->imm]
-							    << "] = " << csrs.get_csr(((Itype*)bytes)->rd)
+						    dbg() << "csrrwi csr[" << ((Itype*)bytes)->imm
+							    << "] = " << csrs.get_csr(((Itype*)bytes)->imm)
 							    << " with rd = " << ((Itype*)bytes)->rd;
 						    consume();
 						    break;
@@ -837,8 +837,8 @@ bool CPU::interpret(uint32_t* bytes) {
 						    csrs.set_csr(((Itype*)bytes)->imm, t | (uint64_t)((Itype*)bytes)->rs1);
 						    regs.x[((Itype*)bytes)->rd] = t;
 						    if constexpr (DBG_CSR)
-						    dbg() << "csrrsi csr[" << regs.x[((Itype*)bytes)->imm]
-							    << "] = " << csrs.get_csr(((Itype*)bytes)->rd)
+						    dbg() << "csrrsi csr[" << ((Itype*)bytes)->imm
+							    << "] = " << csrs.get_csr(((Itype*)bytes)->imm)
 							    << " with rd = " << ((Itype*)bytes)->rd;
 						    consume();
 						    break;
@@ -849,8 +849,8 @@ bool CPU::interpret(uint32_t* bytes) {
 						    csrs.set_csr(((Itype*)bytes)->imm, t & ~(uint64_t)((Itype*)bytes)->rs1);
 						    regs.x[((Itype*)bytes)->rd] = t;
 						    if constexpr (DBG_CSR)
-						    dbg() << "csrrci csr[" << regs.x[((Itype*)bytes)->imm]
-							    << "] = " << csrs.get_csr(((Itype*)bytes)->rd)
+						    dbg() << "csrrci csr[" << ((Itype*)bytes)->imm
+							    << "] = " << csrs.get_csr(((Itype*)bytes)->imm)
 							    << " with rd = " << ((Itype*)bytes)->rd;
 						    consume();
 						    break;
