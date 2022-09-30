@@ -1,6 +1,53 @@
 #include "../hpp/cpu/cpu.hpp"
 
-//std::atomic<bool> CPU::running = 0;
+// TODO: page fault
+// TODO: separate read and write functions so we can page fault accordingly
+// TODO: check for misaligned superpages
+// TODO: set access and dirty bits
+uint64_t CPU::translate_addr(uint64_t addr) {
+	CSRs::satp* satp = (CSRs::satp*)csrs.get_csr_ptr(0x180);
+
+	VirtAddr va = __builtin_bit_cast(VirtAddr, addr);
+	if (satp->mode == 0) return addr;
+	if (satp->mode == 8) {
+		uint64_t dir = satp->ppn * Memory::PAGE_SIZE;
+		PTE pte = __builtin_bit_cast(PTE, memory->read64(dir + va.vpn2 * sizeof(PTE)));
+		if (!pte.v || (!pte.r && pte.w)) {
+			dbg() << "page fault";
+			while (1) { }
+		} else if (pte.r || pte.x) {
+			dbg() << "superpage lv2 leaf found";
+			while (1) { }
+		} else {
+			// TODO: ignore reserved bits which may be 1s
+			dir = (__builtin_bit_cast(uint64_t, pte) >> 10) * Memory::PAGE_SIZE;
+			pte = __builtin_bit_cast(PTE, memory->read64(dir + va.vpn1 * sizeof(PTE)));
+			if (!pte.v || (!pte.r && pte.w)) {
+				dbg() << "page lv1 fault";
+				while (1) { }
+			} else if (pte.r || pte.x) {
+				dbg() << "superpage lv1 leaf found";
+				while (1) { }
+			} else {
+				dir = (__builtin_bit_cast(uint64_t, pte) >> 10) * Memory::PAGE_SIZE;
+				pte = __builtin_bit_cast(PTE, memory->read64(dir + va.vpn0 * sizeof(PTE)));
+				if (!pte.v || (!pte.r && pte.w)) {
+					dbg() << "page lv0 fault";
+					while (1) { }
+				} else if (pte.r || pte.x) {
+					PhysAddr pa;
+					pa.page_off = va.page_off;
+					pa.ppn0 = pte.ppn0;
+					pa.ppn1 = pte.ppn1;
+					pa.ppn2 = pte.ppn2;
+					return __builtin_bit_cast(uint64_t, pa) & 0x0fffffffffff;
+				}
+			}
+		}
+		dbg() << __builtin_bit_cast(uint64_t, pte);
+		return addr;
+	}
+}
 
 bool CPU::run(CPU* c, uint64_t entry) {
 	if (c->parse(entry)) return 1;

@@ -74,50 +74,50 @@ bool CPU::interpret(uint32_t* bytes) {
 			switch(((Itype*)bytes)->funct3) {
 				case 0b000:
 					regs.x[((Itype*)bytes)->rd]
-						= sign_extend8(memory->read8(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm)));
+						= sign_extend8(memory->read8(translate_addr(regs.x[((Itype*)bytes)->rs1]
+									+ sign_extend12(((Itype*)bytes)->imm))));
 					if constexpr (DBG_LOAD)
 					dbg() << "lb x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
 					break;
 				case 0b001:
 					regs.x[((Itype*)bytes)->rd]
-						= sign_extend16(memory->read16(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm)));
+						= sign_extend16(memory->read16(translate_addr(regs.x[((Itype*)bytes)->rs1]
+									+ sign_extend12(((Itype*)bytes)->imm))));
 					if constexpr (DBG_LOAD)
 					dbg() << "lh x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
 					break;
 				case 0b010:
 					regs.x[((Itype*)bytes)->rd]
-						= sign_extend32(memory->read32(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm)));
+						= sign_extend32(memory->read32(translate_addr(regs.x[((Itype*)bytes)->rs1]
+									+ sign_extend12(((Itype*)bytes)->imm))));
 					if constexpr (DBG_LOAD)
 					dbg() << "lw x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
 					break;
 				case 0b011:
 					regs.x[((Itype*)bytes)->rd]
-						= memory->read64(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm));
+						= memory->read64(translate_addr(regs.x[((Itype*)bytes)->rs1]
+									+ sign_extend12(((Itype*)bytes)->imm)));
 					if constexpr (DBG_LOAD)
 					dbg() << "ld x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
 					break;
 				case 0b100:
 					regs.x[((Itype*)bytes)->rd]
-						= memory->read8(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm));
+						= memory->read8(translate_addr(regs.x[((Itype*)bytes)->rs1]
+									+ sign_extend12(((Itype*)bytes)->imm)));
 					if constexpr (DBG_LOAD)
 					dbg() << "lbu x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
 					break;
 				case 0b101:
 					regs.x[((Itype*)bytes)->rd]
-						= memory->read16(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm));
+						= memory->read16(translate_addr(regs.x[((Itype*)bytes)->rs1]
+									+ sign_extend12(((Itype*)bytes)->imm)));
 					if constexpr (DBG_LOAD)
 					dbg() << "lhu x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
 					break;
 				case 0b110:
 					regs.x[((Itype*)bytes)->rd]
-						= memory->read32(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm));
+						= memory->read32(translate_addr(regs.x[((Itype*)bytes)->rs1]
+									+ sign_extend12(((Itype*)bytes)->imm)));
 					if constexpr (DBG_LOAD)
 					dbg() << "lwu x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
 					break;
@@ -284,42 +284,42 @@ bool CPU::interpret(uint32_t* bytes) {
 			switch(((Stype*)bytes)->funct3) {
 				case 0b000:
 					if constexpr (DBG_STORE)
-					dbg() << "sb " << sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1) + regs.x[((Stype*)bytes)->rs1] << " = "
+					dbg() << "sb " << translate_addr(sign_extend12((((Stype*)bytes)->imm2 << 5)
+							| ((Stype*)bytes)->imm1) + regs.x[((Stype*)bytes)->rs1]) << " = "
 						<< ((Stype*)bytes)->rs2 << '(' << regs.x[((Stype*)bytes)->rs2] << ')';
-					memory->write8(regs.x[((Stype*)bytes)->rs1] 
+					memory->write8(translate_addr(regs.x[((Stype*)bytes)->rs1] 
 							+ sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1)
+							| ((Stype*)bytes)->imm1))
 							, regs.x[((Stype*)bytes)->rs2] & 0xFF);
 					break;
 				case 0b001:
 					if constexpr (DBG_STORE)
-					dbg() << "sh " << sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1) + regs.x[((Stype*)bytes)->rs1] << " = "
+					dbg() << "sh " << translate_addr(sign_extend12((((Stype*)bytes)->imm2 << 5)
+							| ((Stype*)bytes)->imm1) + regs.x[((Stype*)bytes)->rs1]) << " = "
 						<< regs.x[((Stype*)bytes)->rs2 & 0xFFFF];
-					memory->write16(regs.x[((Stype*)bytes)->rs1]
+					memory->write16(translate_addr(regs.x[((Stype*)bytes)->rs1]
 							+ sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1)
+							| ((Stype*)bytes)->imm1))
 							, regs.x[((Stype*)bytes)->rs2]);
 					break;
 				case 0b010:
 					if constexpr (DBG_STORE)
-					dbg() << "sw " << sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1) + regs.x[((Stype*)bytes)->rs1] << " = "
+					dbg() << "sw " << translate_addr(sign_extend12((((Stype*)bytes)->imm2 << 5)
+							| ((Stype*)bytes)->imm1) + regs.x[((Stype*)bytes)->rs1]) << " = "
 						<< regs.x[((Stype*)bytes)->rs2 & 0xFFFFFFFF];
-					memory->write32(regs.x[((Stype*)bytes)->rs1]
+					memory->write32(translate_addr(regs.x[((Stype*)bytes)->rs1]
 							+ sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1)
+							| ((Stype*)bytes)->imm1))
 							, regs.x[((Stype*)bytes)->rs2]);
 					break;
 				case 0b011:
 					if constexpr (DBG_STORE)
-					dbg() << "sd " << sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1) + regs.x[((Stype*)bytes)->rs1] << " = "
+					dbg() << "sd " << translate_addr(sign_extend12((((Stype*)bytes)->imm2 << 5)
+							| ((Stype*)bytes)->imm1) + regs.x[((Stype*)bytes)->rs1]) << " = "
 						<< regs.x[((Stype*)bytes)->rs2];
-					memory->write64(regs.x[((Stype*)bytes)->rs1]
+					memory->write64(translate_addr(regs.x[((Stype*)bytes)->rs1]
 							+ sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1)
+							| ((Stype*)bytes)->imm1))
 							, regs.x[((Stype*)bytes)->rs2]);
 					break;
 				default:
@@ -340,8 +340,8 @@ bool CPU::interpret(uint32_t* bytes) {
 				case 0b010:
 					switch (((AMOtype*)bytes)->funct5) {
 						case 0b1: {
-								  uint32_t t = (int32_t)memory->read32(regs.x[((AMOtype*)bytes)->rs1]);
-								  memory->write32(regs.x[((AMOtype*)bytes)->rs1]
+								  uint32_t t = (int32_t)memory->read32(translate_addr(regs.x[((AMOtype*)bytes)->rs1]));
+								  memory->write32(translate_addr(regs.x[((AMOtype*)bytes)->rs1])
 										  , regs.x[((AMOtype*)bytes)->rs2]);
 								  regs.x[((AMOtype*)bytes)->rs2] = t;
 								  if constexpr (DBG_AMO)

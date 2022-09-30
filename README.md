@@ -24,7 +24,7 @@ A network based operating system based on the idea that everything is a node and
  - Incomplete rv64m implementation
  - Incomplete rv64a implementation
  - Single hart CPU
- - No paging
+ - Basic 39bit paging
  - Hacky device support
  - No PLIC
  - No CLINT

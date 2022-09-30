@@ -38,6 +38,11 @@ class CSRs {
 			uint64_t ignore1:34;
 			uint8_t sd:1;
 		};
+		struct satp {
+			uint64_t ppn:44;
+			uint32_t asid:16;
+			uint8_t mode:4;
+		};
 		void set_csr(uint16_t addr, uint64_t value, bool force = 0);
 		uint64_t get_csr(uint16_t addr);
 		uint64_t* get_csr_ptr(uint16_t addr);

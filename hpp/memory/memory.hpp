@@ -7,6 +7,7 @@ class Memory {
 		static constexpr uint32_t MB = 1 * 0x100000;
 		static constexpr uint32_t MEM_SIZE = 132 * MB;
 		static constexpr uint32_t MEM_START = 0x80000000;
+		static constexpr uint32_t PAGE_SIZE = 0x1000;
 	private:
 		template <typename T> T readT(uint64_t addr);
 		template <typename T> void writeT(uint64_t addr, T value);

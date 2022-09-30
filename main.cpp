@@ -35,17 +35,8 @@ int main(int, char* argv[]) {
 	uint64_t entry = elf->load(memory);
 	free(elf);
 
-	dbg() << "Allocating hart0 resources";
-	CPU* c = new CPU(memory);
-	dbg::regs = &c->regs; // TODO: fix this
-
 	dbg() << "Initializing debugger";
 	debugger();
-
-	// Check registers.cpp for read only registers
-	//              I = standard isa; S = supervisor; U = usermode
-	//              misa     10 = 64 bit                            ABCDEFGHIJKLMNOPQRSTUVWXZ
-	//c->csrs.set_csr(0x301, 0b1000000000000000000000000000000000000000000000010000000001010000, 1);
 
 	dbg() << "Starting CPU threads";
 	Threads::start_all_cpus(memory, entry);
