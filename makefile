@@ -6,7 +6,7 @@ OBJ       := $(SRCFILES:%.cpp=%.o)
 
 OPTIMIZATIONLEVEL = 0
 # TODO: sse and sse2 and mmx
-CXXFLAGS     := -std=gnu++20 -Wall -Wextra -O${OPTIMIZATIONLEVEL}
+CXXFLAGS     := -std=c++20 -Wall -Wextra -O${OPTIMIZATIONLEVEL}
 LDFLAGS = -macosx_version_min 12.0 -lSystem -syslibroot `xcrun -sdk macosx --show-sdk-path` -arch arm64
 
 TARGET     = ${BUILDDIR}/machine.bin
