@@ -11,6 +11,7 @@ class CSRs {
 			uint8_t high:2;
 		};
 	public:
+		uint8_t hartid = 0;
 		struct misa {
 			uint64_t ext:26;
 			uint64_t ignore:36;
