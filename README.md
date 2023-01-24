@@ -23,12 +23,12 @@ A network based operating system based on the idea that everything is a node and
  - Complete rv64i implementation
  - Incomplete rv64m implementation
  - Incomplete rv64a implementation
- - Single hart CPU
+ - Dual hart CPU
  - Basic 39bit paging
  - Hacky device support
- - No PLIC
+ - Basic PLIC
  - No CLINT
- - Bare bones CSR support
+ - Basic CSR support
 
 </p>
 
