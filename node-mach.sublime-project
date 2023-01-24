@@ -1,0 +1,16 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+	"build_systems":
+    [
+        {
+            "name": "Run Update",
+            "shell_cmd": "make run-update",
+            "working_dir": "${folder}",
+        }
+    ]
+}
