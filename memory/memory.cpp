@@ -6,17 +6,12 @@ void Memory::writeT(uint64_t addr, T value) {
 		case MEM_START ... MEM_START + MEM_SIZE - 1:
 			*(T*)&(mem[addr - MEM_START]) = value;
 			return;
-		case 0xc0000000:
-			break;
-		// UART HACK
-		case 0x10000000 ... 0x11000000:
-			if (value)
-				std::cerr << (char)value;
-			else
-				std::cerr << "\\0";
-			return;
 		default:
-			dbg() << "   Write to address we can't read from";
+			for (auto d : Threads::instance().devices) {
+				if (d.device->is_in_range(addr)) {
+					d.device->handle_mmio_write(addr, value);
+				}
+			}
 			return;
 	}
 }
@@ -43,11 +38,12 @@ T Memory::readT(uint64_t addr) {
 	switch (addr) {
 		case MEM_START ... MEM_START + MEM_SIZE - 1:
 			return *(T*)&(mem[addr - MEM_START]);
-		// UART HACK
-		case 0x10000000 + 5:
-			return (1<<5);
 		default:
-			dbg() << "   Read from address we can't read from";
+			for (auto d : Threads::instance().devices) {
+				if (d.device->is_in_range(addr)) {
+					return d.device->handle_mmio_read(addr);
+				}
+			}
 			return 0;
 	}
 }
