@@ -595,7 +595,7 @@ bool CPU::interpret(uint32_t* bytes) {
 							dbg() << "divuw x[" <<((Rtype*)bytes)->rd
 								<< "] = x[" << ((Rtype*)bytes)->rs1
 								<< "](" << regs.x[((Rtype*)bytes)->rs1]
-								<< ") * x[" << ((Rtype*)bytes)->rs2
+								<< ") / x[" << ((Rtype*)bytes)->rs2
 								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
 							regs.x[((Rtype*)bytes)->rd]
 								= sign_extend32((uint32_t)regs.x[((Rtype*)bytes)->rs1]
@@ -605,6 +605,17 @@ bool CPU::interpret(uint32_t* bytes) {
 							exception(Exception::Illegal_Instruction);
 							return 1;
 					}
+				case 0b111:
+					if constexpr (DBG_MATH)
+						dbg() << "remuw x[" <<((Rtype*)bytes)->rd
+					<< "] = x[" << ((Rtype*)bytes)->rs1
+					<< "](" << regs.x[((Rtype*)bytes)->rs1]
+					<< ") % x[" << ((Rtype*)bytes)->rs2
+					<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
+					regs.x[((Rtype*)bytes)->rd]
+					= sign_extend32((uint32_t)regs.x[((Rtype*)bytes)->rs1]
+						% (uint32_t)regs.x[((Rtype*)bytes)->rs2]);
+					break;
 				default:
 					exception(Exception::Illegal_Instruction);
 					return 1;
@@ -629,7 +640,7 @@ bool CPU::interpret(uint32_t* bytes) {
 						return 0;
 					} else {
 						if constexpr (DBG_COMP)
-						dbg() << "beq false";
+							dbg() << "beq false";
 						consume();
 					}
 					break;
@@ -649,7 +660,7 @@ bool CPU::interpret(uint32_t* bytes) {
 						index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
 					} else {
 						if constexpr (DBG_COMP)
-						dbg() << "bne false";
+							dbg() << "bne false";
 						consume();
 					}
 					break;
@@ -668,7 +679,7 @@ bool CPU::interpret(uint32_t* bytes) {
 						index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
 					} else {
 						if constexpr (DBG_COMP)
-						dbg() << "blt false";
+							dbg() << "blt false";
 						consume();
 					}
 					break;
@@ -687,7 +698,7 @@ bool CPU::interpret(uint32_t* bytes) {
 						index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
 					} else {
 						if constexpr (DBG_COMP)
-						dbg() << "bge false";
+							dbg() << "bge false";
 						consume();
 					}
 					break;
@@ -706,7 +717,7 @@ bool CPU::interpret(uint32_t* bytes) {
 						index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
 					} else {
 						if constexpr (DBG_COMP)
-						dbg() << "bltu false";
+							dbg() << "bltu false";
 						consume();
 					}
 					break;
@@ -725,7 +736,7 @@ bool CPU::interpret(uint32_t* bytes) {
 						index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
 					} else {
 						if constexpr (DBG_COMP)
-						dbg() << "bgeu false";
+							dbg() << "bgeu false";
 						consume();
 					}
 					break;
@@ -770,14 +781,16 @@ bool CPU::interpret(uint32_t* bytes) {
 							    case 0x20A000:
 								    wait_for_interrupt();
 								    break;
-							    case 0x004000: // uret
 							    case 0x204000: // sret
+								    exception_return(Mode::Supervisor);
+								    break;
+							    case 0x004000: // uret
 							    case 0x404000: // hret
 								    while(1) {};
 								    break;
 							    case 0x604000: // mret
-								    exception_return();
-								    return 0;
+								    exception_return(Mode::Machine);
+								    break;
 							    case 0x002000: // ebreak
 							    case 0:
 								    exception(Exception::ECall_Machine_Mode);
