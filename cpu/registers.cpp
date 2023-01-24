@@ -22,7 +22,7 @@ uint64_t CSRs::get_csr(uint16_t addr) {
 			return 0x4e6f64654d616368;
 		case 0xF14:
 			// Hart ID       //TODO: for multihart return a different id
-			return 0;
+			return hartid;
 	}
 	return csrs[addr];
 }
@@ -46,6 +46,12 @@ void CSRs::set_csr(uint16_t addr, uint64_t value, bool force) {
 			break;
 	}
 	switch (addr) {
+		case 0x100:
+			if constexpr (DBG_CSR)
+			dbg("[2;30;1m[[0;35;2m  CSR   [30;1m][m ")
+				<< "Wrote to sstatus: " << value;
+			csrs[addr] = value;
+			break;
 		case 0x104:
 			if constexpr (DBG_CSR)
 			dbg("[2;30;1m[[0;35;2m  CSR   [30;1m][m ")
@@ -55,32 +61,10 @@ void CSRs::set_csr(uint16_t addr, uint64_t value, bool force) {
 		case 0x180:
 			if constexpr (DBG_CSR)
 			dbg("[2;30;1m[[0;35;2m  CSR   [30;1m][m ")
-				<< "Wrote to page table base address: " << value;
+				<< "Wrote to satp: " << value;
 			csrs[addr] = value;
 			break;
 		case 0x300:
-			/*
-			(*(mstatus*)&csrs[addr]).uie	= (*(mstatus*)&value).uie;
-			(*(mstatus*)&csrs[addr]).sie	= (*(mstatus*)&value).sie;
-			(*(mstatus*)&csrs[addr]).hie	= (*(mstatus*)&value).hie;
-			(*(mstatus*)&csrs[addr]).mie	= (*(mstatus*)&value).mie;
-			(*(mstatus*)&csrs[addr]).upie	= (*(mstatus*)&value).upie;
-			(*(mstatus*)&csrs[addr]).spie	= (*(mstatus*)&value).spie;
-			(*(mstatus*)&csrs[addr]).hpie	= (*(mstatus*)&value).hpie;
-			(*(mstatus*)&csrs[addr]).mpie	= (*(mstatus*)&value).mpie;
-			(*(mstatus*)&csrs[addr]).spp	= (*(mstatus*)&value).spp;
-			(*(mstatus*)&csrs[addr]).hpp	= (*(mstatus*)&value).hpp;
-			(*(mstatus*)&csrs[addr]).mpp	= (*(mstatus*)&value).mpp;
-			(*(mstatus*)&csrs[addr]).fs	= (*(mstatus*)&value).fs;
-			(*(mstatus*)&csrs[addr]).xs	= (*(mstatus*)&value).xs;
-			(*(mstatus*)&csrs[addr]).mpriv	= (*(mstatus*)&value).mpriv;
-			(*(mstatus*)&csrs[addr]).pum	= (*(mstatus*)&value).pum;
-			(*(mstatus*)&csrs[addr]).mxr	= (*(mstatus*)&value).mxr;
-			(*(mstatus*)&csrs[addr]).ignore	= 0;
-			(*(mstatus*)&csrs[addr]).vm	= (*(mstatus*)&value).vm;
-			(*(mstatus*)&csrs[addr]).ignore1= 0;
-			(*(mstatus*)&csrs[addr]).sd	= (*(mstatus*)&value).sd;
-			*/
 			if constexpr (DBG_CSR)
 			dbg("[2;30;1m[[0;35;2m  CSR   [30;1m][m ")
 				<< "Wrote to mstatus: " << value << '/' << csrs[addr];
