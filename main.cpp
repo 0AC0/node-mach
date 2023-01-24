@@ -7,8 +7,13 @@
 #include "hpp/dbg/dbg.hpp"
 #include "hpp/dbg/debugger.hpp"
 #include "hpp/cpu/cpu.hpp"
+#include "hpp/devices/uart.hpp"
 #include "hpp/elf.hpp"
 #include "hpp/threads.hpp"
+
+#include "hpp/devices/plic.hpp"
+#include "hpp/devices/uart.hpp"
+#include "hpp/devices/virtio.hpp"
 
 
 int main(int, char* argv[]) {
@@ -37,6 +42,16 @@ int main(int, char* argv[]) {
 
 	dbg() << "Initializing debugger";
 	debugger();
+
+	dbg() << "Starting Device threads";
+	PLIC* plic = new PLIC(0xC000000);
+	Threads::start_device(plic);
+
+	UART* uart = new UART(0x10000000);
+	Threads::start_device(uart);
+
+	VIRTIO* virtio = new VIRTIO(0x10001000);
+	Threads::start_device(virtio);
 
 	dbg() << "Starting CPU threads";
 	Threads::start_all_cpus(memory, entry);
