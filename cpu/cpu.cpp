@@ -1,5 +1,22 @@
 #include "../hpp/cpu/cpu.hpp"
 
+
+uint32_t CPU::consume() {
+	index++;
+	regs.pc += sizeof(uint32_t);
+	return memory->read32(index);
+}
+
+uint32_t CPU::consume(uint64_t offset) {
+	index += offset;
+	regs.pc += offset;
+	return memory->read32(index);
+}
+
+bool CPU::step() {
+	return interpret((memory->read_instruction(translate_addr(index))));
+}
+
 // TODO: page fault
 // TODO: separate read and write functions so we can page fault accordingly
 // TODO: check for misaligned superpages
@@ -47,6 +64,8 @@ uint64_t CPU::translate_addr(uint64_t addr) {
 		dbg() << __builtin_bit_cast(uint64_t, pte);
 		return addr;
 	}
+	dbg() << "unsupported paging type";
+	while (1) {}
 }
 
 bool CPU::run(CPU* c, uint64_t entry) {
@@ -62,14 +81,15 @@ void CPU::resume() {
 	running = 1;
 }
 
-CPU::CPU(Memory* memory) {
+CPU::CPU(Memory* memory, uint8_t hartid) {
 	this->memory = memory;
+	this->csrs.hartid = hartid;
 }
 
 bool CPU::parse(uint64_t entry) {
 	index = entry;
 	regs.pc = index;
-	dbg() << "Starting hart at entry point: " << regs.pc;
+	dbg() << "Starting hart " << csrs.hartid << " at entry point: " << regs.pc;
 	while (index < Memory::MEM_SIZE + Memory::MEM_START) {
 		csrs.set_csr(0xC00, csrs.get_csr(0xC00) + 1);
 		csrs.set_csr(0xB00, csrs.get_csr(0xB00) + 1);
@@ -81,7 +101,7 @@ bool CPU::parse(uint64_t entry) {
 					dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << regs.name[j] << ": " << regs.x[j];
 				}
 
-#if 0
+				#if 0
 				dbg* d = new dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ");
 				uint32_t buffer[5] = {0};
 				*d << "Memory dump: " << '\n';
@@ -105,7 +125,7 @@ bool CPU::parse(uint64_t entry) {
 					}
 				}
 				d->~dbg();
-#endif
+				#endif
 				return 1;
 			}
 		} else {

@@ -9,12 +9,19 @@
 #include "instruction.hpp"
 #include "../memory/memory.hpp"
 
+class Memory;
+
 class CPU {
 	private:
 		enum Exception {
 			Illegal_Instruction	 = 2,
 			Breakpoint		 = 3,
+			ECall_User_Mode		 = 8,
+			ECall_Supervisor_Mode	 = 9,
 			ECall_Machine_Mode	 = 11,
+			Instruction_Page_Fault	 = 12,
+			Load_Page_Fault		 = 13,
+			Store_Page_Fault	 = 15,
 		};
 		enum Mode {
 			User			 = 0,
@@ -59,7 +66,7 @@ class CPU {
 
 		bool interpret(uint32_t* bytes);
 		void exception(Exception ex);
-		void exception_return();
+		void exception_return(Mode m);
 		void wait_for_interrupt();
 		uint64_t translate_addr(uint64_t addr);
 	public:
@@ -67,12 +74,12 @@ class CPU {
 		CSRs csrs;
 		uint8_t get_mode() { return this->mode; }
 		Memory* memory = 0;
-		CPU(Memory* memory);
+		CPU(Memory* memory, uint8_t hartid);
 
-		uint32_t consume() { index++; regs.pc += sizeof(uint32_t); return memory->read32(index); }
-		uint32_t consume(uint64_t offset) { index += offset; regs.pc += offset; return memory->read32(index); }
+		uint32_t consume();
+		uint32_t consume(uint64_t offset);
 
-		bool step() { return interpret((memory->read_instruction(translate_addr(index)))); }
+		bool step();
 		bool parse(uint64_t entry);
 
 		static bool run(CPU* c, uint64_t entry);
