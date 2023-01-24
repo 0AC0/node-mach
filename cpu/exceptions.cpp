@@ -18,15 +18,28 @@ void CPU::exception(Exception ex) {
 	}
 }
 
-void CPU::exception_return() {
-	switch (mode) {
+void CPU::exception_return(Mode m) {
+	switch (m) {
 		// return from machine mode
+		case Mode::Supervisor: {
+					    CSRs::mstatus* stat = (CSRs::mstatus*)csrs.get_csr_ptr(0x100);
+
+					    stat->sie = stat->spie;
+					    mode = stat->spp; // set to previous mode
+					    dbg() << "Switched to mode: " << (uint64_t)mode;
+					    stat->spie = 1;
+					    stat->spp = Mode::User;
+
+					    regs.pc = csrs.get_csr(0x141); //sepc
+					    index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
+					    return;
+				    }
 		case Mode::Machine: {
 					    CSRs::mstatus* stat = (CSRs::mstatus*)csrs.get_csr_ptr(0x300);
 
 					    stat->mie = stat->mpie;
 					    mode = stat->mpp; // set to previous mode
-					    dbg() << "Switched to mode: " << mode;
+					    dbg() << "Switched to mode: " << (uint64_t)mode;
 					    stat->mpie = 1;
 					    stat->mpp = Mode::User;
 
