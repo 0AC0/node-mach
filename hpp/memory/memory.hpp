@@ -1,11 +1,13 @@
 #pragma once
 #include <stdint.h>
 #include "../dbg/dbg.hpp"
+#include "../devices/device.hpp"
+#include "../threads.hpp"
 
 class Memory {
 	public:
 		static constexpr uint32_t MB = 1 * 0x100000;
-		static constexpr uint32_t MEM_SIZE = 132 * MB;
+		static constexpr uint32_t MEM_SIZE = 12 * MB;
 		static constexpr uint32_t MEM_START = 0x80000000;
 		static constexpr uint32_t PAGE_SIZE = 0x1000;
 	private:
