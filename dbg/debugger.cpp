@@ -5,9 +5,6 @@ debugger* debugger::d = 0;
 void debugger::operator()(int){
 	Threads::pause_all_cpus();
 	
-	// wait 1 second for all the threads to acknowledge
-	std::this_thread::sleep_for(std::chrono::seconds(1));
-
 	char command[40] = {0};
 	while (1) {
 		memset(command, 0, 40);

@@ -79,6 +79,7 @@ void CPU::pause() {
 
 void CPU::resume() {
 	running = 1;
+	cv.notify_all();
 }
 
 CPU::CPU(Memory* memory, uint8_t hartid) {
@@ -93,13 +94,16 @@ bool CPU::parse(uint64_t entry) {
 	while (index < Memory::MEM_SIZE + Memory::MEM_START) {
 		csrs.set_csr(0xC00, csrs.get_csr(0xC00) + 1);
 		csrs.set_csr(0xB00, csrs.get_csr(0xB00) + 1);
-		if (running) {
-			if (step()) {
-				dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << "pc: " << regs.pc;
 
-				for (uint8_t j = 0; j < 32; j++) {
-					dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << regs.name[j] << ": " << regs.x[j];
-				}
+		std::unique_lock<std::mutex> lock(mutex);
+		cv.wait(lock, [this] { return running; });
+
+		if (step()) {
+			dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << "pc: " << regs.pc;
+
+			for (uint8_t j = 0; j < 32; j++) {
+				dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << regs.name[j] << ": " << regs.x[j];
+			}
 
 				#if 0
 				dbg* d = new dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ");
@@ -126,10 +130,7 @@ bool CPU::parse(uint64_t entry) {
 				}
 				d->~dbg();
 				#endif
-				return 1;
-			}
-		} else {
-			std::this_thread::sleep_for(std::chrono::seconds(1));
+			return 1;
 		}
 	}
 	return 0;

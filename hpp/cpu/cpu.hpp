@@ -1,4 +1,6 @@
 #pragma once
+#include <condition_variable>
+#include <mutex>
 #include <stdint.h>
 #include <atomic>
 #include <thread>
@@ -14,19 +16,19 @@ class Memory;
 class CPU {
 	private:
 		enum Exception {
-			Illegal_Instruction	 = 2,
-			Breakpoint		 = 3,
-			ECall_User_Mode		 = 8,
+			Illegal_Instruction		 = 2,
+			Breakpoint				 = 3,
+			ECall_User_Mode			 = 8,
 			ECall_Supervisor_Mode	 = 9,
-			ECall_Machine_Mode	 = 11,
+			ECall_Machine_Mode		 = 11,
 			Instruction_Page_Fault	 = 12,
-			Load_Page_Fault		 = 13,
-			Store_Page_Fault	 = 15,
+			Load_Page_Fault			 = 13,
+			Store_Page_Fault		 = 15,
 		};
 		enum Mode {
 			User			 = 0,
 			Supervisor		 = 1,
-			//Hypervisor		 = 2, // Unimplemented
+			//Hypervisor	 = 2, // Unimplemented
 			Machine			 = 3,
 		};
 
@@ -62,14 +64,16 @@ class CPU {
 
 		uint8_t mode = Mode::Machine;
 		uint64_t index = 0;
-		std::atomic<bool> running = 1; //pretty sure atomic is unnecessary currently
+		bool running = 1;
 
 		bool interpret(uint32_t* bytes);
 		void exception(Exception ex);
 		void exception_return(Mode m);
 		void wait_for_interrupt();
 		uint64_t translate_addr(uint64_t addr);
+		std::mutex mutex;
 	public:
+		std::condition_variable cv;
 		Regs regs;
 		CSRs csrs;
 		uint8_t get_mode() { return this->mode; }
