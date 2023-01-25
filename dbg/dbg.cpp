@@ -2,7 +2,10 @@
 
 Regs* dbg::regs = 0;
 
+std::mutex dbg::mutex;
+
 dbg::dbg() {
+	mutex.lock();
 	if (regs)
 		std::cout << "[2;30;1m[[0;33;2m" << std::hex << std::uppercase << std::setfill('0') << std::setw(8) << regs->pc << "[30;1m][m ";
 	else
@@ -10,6 +13,7 @@ dbg::dbg() {
 }
 
 dbg::~dbg() {
+	mutex.unlock();
 	std::cout << std::endl;
 }
 

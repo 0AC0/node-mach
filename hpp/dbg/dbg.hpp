@@ -2,6 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <stdint.h>
+#include <mutex>
 #include "../cpu/registers.hpp"
 
 constexpr bool DBG_LOAD  = 0;
@@ -20,6 +21,7 @@ class dbg {
 
 	public:
 		static Regs* regs;
+		static std::mutex mutex;
 		dbg();
 		dbg(const char* str);
 		~dbg();
