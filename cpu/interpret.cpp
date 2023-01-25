@@ -759,8 +759,6 @@ bool CPU::interpret(uint32_t* bytes) {
 						   - Memory::MEM_START) / 4 + Memory::MEM_START;
 				   regs.x[((Itype*)bytes)->rd] = t;
 				   return 0;
-				   /*
-				   */
 			   }
 		case 0x1B:  {
 				    regs.pc += sign_extend20(((Jtype*)bytes)->imm4 << 19
@@ -776,8 +774,10 @@ bool CPU::interpret(uint32_t* bytes) {
 		case 0x1C:
 			switch(((Itype*)bytes)->funct3) {
 				case 0b000: {
-						    dbg() << ((Instruction*)bytes)->data;
+						    //dbg() << ((Instruction*)bytes)->data;
 						    switch (((Instruction*)bytes)->data) {
+							    case 0x240000: // sfence.vma
+							    	break;
 							    case 0x20A000:
 								    wait_for_interrupt();
 								    break;
@@ -867,7 +867,7 @@ bool CPU::interpret(uint32_t* bytes) {
 							    << " with rd = " << ((Itype*)bytes)->rd;
 						    consume();
 						    break;
-					    }
+						}
 				default:
 					    exception(Exception::Illegal_Instruction);
 					    return 1;
