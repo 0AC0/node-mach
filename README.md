@@ -14,7 +14,7 @@ A network based operating system based on the idea that everything is a node and
 ### Current project status
 ![platform](https://img.shields.io/badge/Platform-MacOS-brightgreen)
 ![commit](https://img.shields.io/github/last-commit/0ac0/node-mach)
-![build](https://img.shields.io/github/workflow/status/0AC0/node-mach/Make%20simple%20CI)
+![build](https://img.shields.io/github/actions/workflow/status/0AC0/node-mach/makefile.yml?branch=main)
 ![lang](https://img.shields.io/github/languages/top/0ac0/node-mach)
 ![code](https://img.shields.io/github/languages/code-size/0ac0/node-mach)
 ![nodenet](https://img.shields.io/badge/NodeNet-Download%20Soon-red)
@@ -23,12 +23,12 @@ A network based operating system based on the idea that everything is a node and
  - Complete rv64i implementation
  - Incomplete rv64m implementation
  - Incomplete rv64a implementation
- - Single hart CPU
+ - Dual hart CPU
  - Basic 39bit paging
  - Hacky device support
- - No PLIC
+ - Basic PLIC
  - No CLINT
- - Bare bones CSR support
+ - Basic CSR support
 
 </p>
 
