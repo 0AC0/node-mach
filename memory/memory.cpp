@@ -10,9 +10,10 @@ void Memory::writeT(uint64_t addr, T value) {
 			for (auto d : Threads::instance().devices) {
 				if (d.device->is_in_range(addr)) {
 					d.device->handle_mmio_write(addr, value);
+					return;
 				}
 			}
-			return;
+			dbg() << "MMU: Ignoring write to: " << addr << " out of range";
 	}
 }
 
@@ -44,6 +45,7 @@ T Memory::readT(uint64_t addr) {
 					return d.device->handle_mmio_read(addr);
 				}
 			}
+			dbg() << "MMU: Ignoring read from: " << addr << " out of range";
 			return 0;
 	}
 }
