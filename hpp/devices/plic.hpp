@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include "device.hpp"
 #include "../dbg/dbg.hpp"
+#include "../threads.hpp"
+#include "../cpu/cpu.hpp"
 
 class PLIC : public Device {
 	private:
@@ -11,9 +13,9 @@ class PLIC : public Device {
 		uint32_t address_space[SIZE / sizeof(uint32_t)] = {0};
 
 	public:
+		uint8_t get_free_cpu();
 		void handle_mmio_write(uint64_t addr, uint64_t value);
 		uint64_t handle_mmio_read(uint64_t addr);
 		bool is_in_range(uint64_t addr);
-		//static void run() { dbg() << "PLIC starting... "; };
 		PLIC(const uint64_t base) { this->BASE = base; }
 };

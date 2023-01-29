@@ -17,6 +17,7 @@ class CSRs {
 			uint64_t ignore:36;
 			uint64_t base:2;
 		};
+		#pragma pack(push, 1)
 		struct mstatus {
 			uint8_t uie:1;
 			uint8_t sie:1;
@@ -39,6 +40,7 @@ class CSRs {
 			uint64_t ignore1:34;
 			uint8_t sd:1;
 		};
+		#pragma pack(pop)
 		struct satp {
 			uint64_t ppn:44;
 			uint32_t asid:16;

@@ -20,11 +20,18 @@ void PLIC::handle_mmio_write(uint64_t addr, uint64_t value) {
 			break;
 		case 0x200000 ... 0x3FFF000:
 			if (addr & 4) {
+				//complete/claim
 			} else {
+				//threshold
 			}
 			break;
 	}
 	*/
+}
+
+uint8_t PLIC::get_free_cpu() {
+	dbg() << "PLIC::get_free_cpu(): UNIMPLEMENTED";
+	return 1;
 }
 
 uint64_t PLIC::handle_mmio_read(uint64_t addr) {

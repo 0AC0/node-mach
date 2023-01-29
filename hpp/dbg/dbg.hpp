@@ -13,6 +13,8 @@ constexpr bool DBG_MATH  = 0;
 constexpr bool DBG_AMO   = 0;
 constexpr bool DBG_CSR   = 0;
 constexpr bool DBG_FENCE = 0;
+constexpr bool DBG_IRQ   = 1;
+constexpr bool DBG_MMU   = 1;
 
 class Regs;
 

@@ -37,6 +37,14 @@ void debugger::operator()(int){
 		} else if (std::strncmp(command, "show", 4) == 0) {
 			for (uint8_t i = 0; i < 40; i++)
 				std::cout << command[i];
+		} else if (std::strncmp(command, "fire", 4) == 0) {
+			try {
+				uint64_t interrupt = std::stoi(command + 5, nullptr, 16);
+				Threads::instance().cpus[0].cpu->interrupt(interrupt);
+
+			} catch (std::exception &err) {
+				dbg() << "Invalid irq number: " << command + 5;
+			}
 		} else if (std::strncmp(command, "read64", 6) == 0) {
 			try {
 				uint64_t addr = std::stoi(command + 7, nullptr, 16);
