@@ -2,19 +2,17 @@
 
 
 uint32_t CPU::consume() {
-	index++;
 	regs.pc += sizeof(uint32_t);
-	return memory->read32(index);
+	return memory->read32(regs.pc);
 }
 
 uint32_t CPU::consume(uint64_t offset) {
-	index += offset;
 	regs.pc += offset;
-	return memory->read32(index);
+	return memory->read32(regs.pc);
 }
 
 bool CPU::step() {
-	return interpret((memory->read_instruction(translate_addr(index))));
+	return interpret((memory->read64(translate_addr(regs.pc))));
 }
 
 // TODO: page fault
@@ -30,8 +28,12 @@ uint64_t CPU::translate_addr(uint64_t addr) {
 		uint64_t dir = satp->ppn * Memory::PAGE_SIZE;
 		PTE pte = __builtin_bit_cast(PTE, memory->read64(dir + va.vpn2 * sizeof(PTE)));
 		if (!pte.v || (!pte.r && pte.w)) {
-			dbg() << "page fault";
-			while (1) { }
+			dbg() << "page fault"
+			<< " addr: " << addr
+			<< " pte.v: " << pte.v
+			<< " pte.r: " << pte.r
+			<< " pte.w: " << pte.w;
+			exception(Exception::Load_Page_Fault, addr);
 		} else if (pte.r || pte.x) {
 			dbg() << "superpage lv2 leaf found";
 			while (1) { }
@@ -40,8 +42,12 @@ uint64_t CPU::translate_addr(uint64_t addr) {
 			dir = (__builtin_bit_cast(uint64_t, pte) >> 10) * Memory::PAGE_SIZE;
 			pte = __builtin_bit_cast(PTE, memory->read64(dir + va.vpn1 * sizeof(PTE)));
 			if (!pte.v || (!pte.r && pte.w)) {
-				dbg() << "page lv1 fault";
-				while (1) { }
+				dbg() << "page lv1 fault " 
+				<< " addr: " << addr
+				<< " pte.v: " << pte.v
+				<< " pte.r: " << pte.r
+				<< " pte.w: " << pte.w;
+				exception(Exception::Load_Page_Fault, addr);
 			} else if (pte.r || pte.x) {
 				dbg() << "superpage lv1 leaf found";
 				while (1) { }
@@ -49,8 +55,12 @@ uint64_t CPU::translate_addr(uint64_t addr) {
 				dir = (__builtin_bit_cast(uint64_t, pte) >> 10) * Memory::PAGE_SIZE;
 				pte = __builtin_bit_cast(PTE, memory->read64(dir + va.vpn0 * sizeof(PTE)));
 				if (!pte.v || (!pte.r && pte.w)) {
-					dbg() << "page lv0 fault";
-					while (1) { }
+					dbg() << "page lv0 fault"
+					<< " addr: " << addr
+					<< " pte.v: " << pte.v
+					<< " pte.r: " << pte.r
+					<< " pte.w: " << pte.w;
+					exception(Exception::Load_Page_Fault, addr);
 				} else if (pte.r || pte.x) {
 					PhysAddr pa;
 					pa.page_off = va.page_off;
@@ -88,10 +98,9 @@ CPU::CPU(Memory* memory, uint8_t hartid) {
 }
 
 bool CPU::parse(uint64_t entry) {
-	index = entry;
-	regs.pc = index;
+	regs.pc = entry;
 	dbg() << "Starting hart " << csrs.hartid << " at entry point: " << regs.pc;
-	while (index < Memory::MEM_SIZE + Memory::MEM_START) {
+	while (regs.pc < Memory::MEM_SIZE + Memory::MEM_START) {
 		csrs.set_csr(0xC00, csrs.get_csr(0xC00) + 1);
 		csrs.set_csr(0xB00, csrs.get_csr(0xB00) + 1);
 
@@ -133,5 +142,5 @@ bool CPU::parse(uint64_t entry) {
 			return 1;
 		}
 	}
-	return 0;
+	return 1;
 }

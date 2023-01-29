@@ -63,11 +63,10 @@ class CPU {
 		};
 
 		uint8_t mode = Mode::Machine;
-		uint64_t index = 0;
 		bool running = 1;
 
-		bool interpret(uint32_t* bytes);
-		void exception(Exception ex);
+		bool interpret(uint32_t bytes);
+		void exception(Exception ex, uint64_t info = 0);
 		void exception_return(Mode m);
 		void wait_for_interrupt();
 		uint64_t translate_addr(uint64_t addr);
@@ -87,6 +86,7 @@ class CPU {
 		bool parse(uint64_t entry);
 
 		static bool run(CPU* c, uint64_t entry);
+		void interrupt(uint64_t irq);
 		void pause();
 		void resume();
 };

@@ -59,67 +59,67 @@ uint64_t arithmetic_right_shift(uint64_t x, uint64_t n) {
 	return x >> n | ~(~0ULL >> n);
 }
 
-bool CPU::interpret(uint32_t* bytes) {
+bool CPU::interpret(uint32_t bytes) {
 	if (regs.x[0] != 0) regs.x[0] = 0;
 
-	if (((Instruction*)bytes)->three != 3) {
+	if (((Instruction*)&bytes)->three != 3) {
 		dbg("[2;30;1m[[0;31;2m  DEAD  [30;1m][m ") << "NOT AN INSTRUCTION: "
-			<< *bytes << " at "
+			<< bytes << " at "
 			<< regs.pc;
 		
-		return 0;
+		return 1;
 	}
-	switch(((Instruction*)bytes)->op) {
+	switch(((Instruction*)&bytes)->op) {
 		case 0x0:
-			switch(((Itype*)bytes)->funct3) {
+			switch(((Itype*)&bytes)->funct3) {
 				case 0b000:
-					regs.x[((Itype*)bytes)->rd]
-						= sign_extend8(memory->read8(translate_addr(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm))));
+					regs.x[((Itype*)&bytes)->rd]
+						= sign_extend8(memory->read8(translate_addr(regs.x[((Itype*)&bytes)->rs1]
+									+ sign_extend12(((Itype*)&bytes)->imm))));
 					if constexpr (DBG_LOAD)
-					dbg() << "lb x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
+					dbg() << "lb x[" << ((Itype*)&bytes)->rd << "](" << regs.x[((Itype*)&bytes)->rd] << ')';
 					break;
 				case 0b001:
-					regs.x[((Itype*)bytes)->rd]
-						= sign_extend16(memory->read16(translate_addr(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm))));
+					regs.x[((Itype*)&bytes)->rd]
+						= sign_extend16(memory->read16(translate_addr(regs.x[((Itype*)&bytes)->rs1]
+									+ sign_extend12(((Itype*)&bytes)->imm))));
 					if constexpr (DBG_LOAD)
-					dbg() << "lh x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
+					dbg() << "lh x[" << ((Itype*)&bytes)->rd << "](" << regs.x[((Itype*)&bytes)->rd] << ')';
 					break;
 				case 0b010:
-					regs.x[((Itype*)bytes)->rd]
-						= sign_extend32(memory->read32(translate_addr(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm))));
+					regs.x[((Itype*)&bytes)->rd]
+						= sign_extend32(memory->read32(translate_addr(regs.x[((Itype*)&bytes)->rs1]
+									+ sign_extend12(((Itype*)&bytes)->imm))));
 					if constexpr (DBG_LOAD)
-					dbg() << "lw x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
+					dbg() << "lw x[" << ((Itype*)&bytes)->rd << "](" << regs.x[((Itype*)&bytes)->rd] << ')';
 					break;
 				case 0b011:
-					regs.x[((Itype*)bytes)->rd]
-						= memory->read64(translate_addr(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm)));
+					regs.x[((Itype*)&bytes)->rd]
+						= memory->read64(translate_addr(regs.x[((Itype*)&bytes)->rs1]
+									+ sign_extend12(((Itype*)&bytes)->imm)));
 					if constexpr (DBG_LOAD)
-					dbg() << "ld x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
+					dbg() << "ld x[" << ((Itype*)&bytes)->rd << "](" << regs.x[((Itype*)&bytes)->rd] << ')';
 					break;
 				case 0b100:
-					regs.x[((Itype*)bytes)->rd]
-						= memory->read8(translate_addr(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm)));
+					regs.x[((Itype*)&bytes)->rd]
+						= memory->read8(translate_addr(regs.x[((Itype*)&bytes)->rs1]
+									+ sign_extend12(((Itype*)&bytes)->imm)));
 					if constexpr (DBG_LOAD)
-					dbg() << "lbu x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
+					dbg() << "lbu x[" << ((Itype*)&bytes)->rd << "](" << regs.x[((Itype*)&bytes)->rd] << ')';
 					break;
 				case 0b101:
-					regs.x[((Itype*)bytes)->rd]
-						= memory->read16(translate_addr(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm)));
+					regs.x[((Itype*)&bytes)->rd]
+						= memory->read16(translate_addr(regs.x[((Itype*)&bytes)->rs1]
+									+ sign_extend12(((Itype*)&bytes)->imm)));
 					if constexpr (DBG_LOAD)
-					dbg() << "lhu x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
+					dbg() << "lhu x[" << ((Itype*)&bytes)->rd << "](" << regs.x[((Itype*)&bytes)->rd] << ')';
 					break;
 				case 0b110:
-					regs.x[((Itype*)bytes)->rd]
-						= memory->read32(translate_addr(regs.x[((Itype*)bytes)->rs1]
-									+ sign_extend12(((Itype*)bytes)->imm)));
+					regs.x[((Itype*)&bytes)->rd]
+						= memory->read32(translate_addr(regs.x[((Itype*)&bytes)->rs1]
+									+ sign_extend12(((Itype*)&bytes)->imm)));
 					if constexpr (DBG_LOAD)
-					dbg() << "lwu x[" << ((Itype*)bytes)->rd << "](" << regs.x[((Itype*)bytes)->rd] << ')';
+					dbg() << "lwu x[" << ((Itype*)&bytes)->rd << "](" << regs.x[((Itype*)&bytes)->rd] << ')';
 					break;
 				default:
 					exception(Exception::Illegal_Instruction);
@@ -134,74 +134,74 @@ bool CPU::interpret(uint32_t* bytes) {
 			consume();
 			break;
 		case 0x4:
-			switch(((Itype*)bytes)->funct3) {
+			switch(((Itype*)&bytes)->funct3) {
 				case 0b000:
-					regs.x[((Itype*)bytes)->rd]
-						= regs.x[((Itype*)bytes)->rs1] + sign_extend12(((Itype*)bytes)->imm);
+					regs.x[((Itype*)&bytes)->rd]
+						= regs.x[((Itype*)&bytes)->rs1] + sign_extend12(((Itype*)&bytes)->imm);
 					if constexpr (DBG_MATH)
-					dbg() << "addi x[" << ((Itype*)bytes)->rs1 << "]("
-						<< regs.x[((Itype*)bytes)->rs1] << ") + imm("
-						<< sign_extend12(((Itype*)bytes)->imm) << ") = x["
-						<< ((Itype*)bytes)->rd << "]("
-						<< regs.x[((Itype*)bytes)->rd] << ')';
+					dbg() << "addi x[" << ((Itype*)&bytes)->rs1 << "]("
+						<< regs.x[((Itype*)&bytes)->rs1] << ") + imm("
+						<< sign_extend12(((Itype*)&bytes)->imm) << ") = x["
+						<< ((Itype*)&bytes)->rd << "]("
+						<< regs.x[((Itype*)&bytes)->rd] << ')';
 					break;
 				case 0b001:
-					regs.x[((SHIFTtype*)bytes)->rd]
-						= regs.x[((SHIFTtype*)bytes)->rs1] << sign_extend12(((SHIFTtype*)bytes)->shamt);
+					regs.x[((SHIFTtype*)&bytes)->rd]
+						= regs.x[((SHIFTtype*)&bytes)->rs1] << sign_extend12(((SHIFTtype*)&bytes)->shamt);
 					if constexpr (DBG_MATH)
-					dbg() << "slli x[" << ((SHIFTtype*)bytes)->rd << "] << "
-						<< sign_extend12(((SHIFTtype*)bytes)->shamt) << " = "
-						<< regs.x[((SHIFTtype*)bytes)->rd];
+					dbg() << "slli x[" << ((SHIFTtype*)&bytes)->rd << "] << "
+						<< sign_extend12(((SHIFTtype*)&bytes)->shamt) << " = "
+						<< regs.x[((SHIFTtype*)&bytes)->rd];
 					break;
 				case 0b010:
 					if constexpr (DBG_MATH)
-					dbg() << "slti x[" << ((Itype*)bytes)->rd << "] = "
-						<< ((int64_t)regs.x[((Itype*)bytes)->rs1]) << " < "
-						<< ((int64_t)sign_extend12(((Itype*)bytes)->imm)) << " ? "
-						<< (bool)(((int64_t)regs.x[((Itype*)bytes)->rs1])
-						< ((int64_t)sign_extend12(((Itype*)bytes)->imm)) ? 1 : 0);
-					regs.x[((Itype*)bytes)->rd]
-						= ((int64_t)regs.x[((Itype*)bytes)->rs1])
-						< ((int64_t)sign_extend12(((Itype*)bytes)->imm)) ? 1 : 0;
+					dbg() << "slti x[" << ((Itype*)&bytes)->rd << "] = "
+						<< ((int64_t)regs.x[((Itype*)&bytes)->rs1]) << " < "
+						<< ((int64_t)sign_extend12(((Itype*)&bytes)->imm)) << " ? "
+						<< (bool)(((int64_t)regs.x[((Itype*)&bytes)->rs1])
+						< ((int64_t)sign_extend12(((Itype*)&bytes)->imm)) ? 1 : 0);
+					regs.x[((Itype*)&bytes)->rd]
+						= ((int64_t)regs.x[((Itype*)&bytes)->rs1])
+						< ((int64_t)sign_extend12(((Itype*)&bytes)->imm)) ? 1 : 0;
 					break;
 				case 0b011:
 					if constexpr (DBG_MATH)
-					dbg() << "sltiu x[" << ((Itype*)bytes)->rd << "] = "
-						<< ((uint64_t)regs.x[((Itype*)bytes)->rs1]) << " < "
-						<< ((uint64_t)sign_extend12(((Itype*)bytes)->imm)) << " ? "
-						<< (bool)(((uint64_t)regs.x[((Itype*)bytes)->rs1])
-						< ((uint64_t)sign_extend12(((Itype*)bytes)->imm)) ? 1 : 0);
-					regs.x[((Itype*)bytes)->rd]
-						= ((uint64_t)regs.x[((Itype*)bytes)->rs1])
-						< ((uint64_t)sign_extend12(((Itype*)bytes)->imm)) ? 1 : 0;
+					dbg() << "sltiu x[" << ((Itype*)&bytes)->rd << "] = "
+						<< ((uint64_t)regs.x[((Itype*)&bytes)->rs1]) << " < "
+						<< ((uint64_t)sign_extend12(((Itype*)&bytes)->imm)) << " ? "
+						<< (bool)(((uint64_t)regs.x[((Itype*)&bytes)->rs1])
+						< ((uint64_t)sign_extend12(((Itype*)&bytes)->imm)) ? 1 : 0);
+					regs.x[((Itype*)&bytes)->rd]
+						= ((uint64_t)regs.x[((Itype*)&bytes)->rs1])
+						< ((uint64_t)sign_extend12(((Itype*)&bytes)->imm)) ? 1 : 0;
 					break;
 				case 0b100:
-					regs.x[((Itype*)bytes)->rd]
-						= regs.x[((Itype*)bytes)->rs1] ^ sign_extend12(((Itype*)bytes)->imm);
+					regs.x[((Itype*)&bytes)->rd]
+						= regs.x[((Itype*)&bytes)->rs1] ^ sign_extend12(((Itype*)&bytes)->imm);
 					if constexpr (DBG_MATH)
-					dbg() << "xori x[" << ((Itype*)bytes)->rd << "] ^ "
-						<< sign_extend12(((Itype*)bytes)->imm) << " = "
-						<< regs.x[((Itype*)bytes)->rd];
+					dbg() << "xori x[" << ((Itype*)&bytes)->rd << "] ^ "
+						<< sign_extend12(((Itype*)&bytes)->imm) << " = "
+						<< regs.x[((Itype*)&bytes)->rd];
 					break;
 				case 0b101:
-					switch (((SHIFTtype*)bytes)->type) {
+					switch (((SHIFTtype*)&bytes)->type) {
 						case 0b0000000:
-							regs.x[((SHIFTtype*)bytes)->rd]
-								= regs.x[((SHIFTtype*)bytes)->rs1] >> sign_extend12(((SHIFTtype*)bytes)->shamt);
+							regs.x[((SHIFTtype*)&bytes)->rd]
+								= regs.x[((SHIFTtype*)&bytes)->rs1] >> sign_extend12(((SHIFTtype*)&bytes)->shamt);
 							if constexpr (DBG_MATH)
-							dbg() << "srli x[" << ((SHIFTtype*)bytes)->rd << "] >>l "
-								<< sign_extend12(((SHIFTtype*)bytes)->shamt) << " = "
-								<< regs.x[((SHIFTtype*)bytes)->rd];
+							dbg() << "srli x[" << ((SHIFTtype*)&bytes)->rd << "] >>l "
+								<< sign_extend12(((SHIFTtype*)&bytes)->shamt) << " = "
+								<< regs.x[((SHIFTtype*)&bytes)->rd];
 							break;
 						case 0b0010000:
-							regs.x[((SHIFTtype*)bytes)->rd]
+							regs.x[((SHIFTtype*)&bytes)->rd]
 								= arithmetic_right_shift
-								(regs.x[((SHIFTtype*)bytes)->rs1]
-								 ,  sign_extend12(((SHIFTtype*)bytes)->shamt));
+								(regs.x[((SHIFTtype*)&bytes)->rs1]
+								 ,  sign_extend12(((SHIFTtype*)&bytes)->shamt));
 							if constexpr (DBG_MATH)
-							dbg() << "srai x[" << ((SHIFTtype*)bytes)->rd << "] >>a "
-								<< sign_extend12(((SHIFTtype*)bytes)->shamt) << " = "
-								<< regs.x[((SHIFTtype*)bytes)->rd];
+							dbg() << "srai x[" << ((SHIFTtype*)&bytes)->rd << "] >>a "
+								<< sign_extend12(((SHIFTtype*)&bytes)->shamt) << " = "
+								<< regs.x[((SHIFTtype*)&bytes)->rd];
 							break;
 						default:
 							exception(Exception::Illegal_Instruction);
@@ -209,20 +209,20 @@ bool CPU::interpret(uint32_t* bytes) {
 					}
 					break;
 				case 0b110:
-					regs.x[((Itype*)bytes)->rd]
-						= regs.x[((Itype*)bytes)->rs1] | sign_extend12(((Itype*)bytes)->imm);
+					regs.x[((Itype*)&bytes)->rd]
+						= regs.x[((Itype*)&bytes)->rs1] | sign_extend12(((Itype*)&bytes)->imm);
 					if constexpr (DBG_MATH)
-					dbg() << "ori x[" << ((Itype*)bytes)->rd << "] | "
-						<< sign_extend12(((Itype*)bytes)->imm) << " = "
-						<< regs.x[((Itype*)bytes)->rd];
+					dbg() << "ori x[" << ((Itype*)&bytes)->rd << "] | "
+						<< sign_extend12(((Itype*)&bytes)->imm) << " = "
+						<< regs.x[((Itype*)&bytes)->rd];
 					break;
 				case 0b111:
-					regs.x[((Itype*)bytes)->rd]
-						= regs.x[((Itype*)bytes)->rs1] & sign_extend12(((Itype*)bytes)->imm);
+					regs.x[((Itype*)&bytes)->rd]
+						= regs.x[((Itype*)&bytes)->rs1] & sign_extend12(((Itype*)&bytes)->imm);
 					if constexpr (DBG_MATH)
-					dbg() << "andi x[" << ((Itype*)bytes)->rd << "] & "
-						<< sign_extend12(((Itype*)bytes)->imm) << " = "
-						<< regs.x[((Itype*)bytes)->rd];
+					dbg() << "andi x[" << ((Itype*)&bytes)->rd << "] & "
+						<< sign_extend12(((Itype*)&bytes)->imm) << " = "
+						<< regs.x[((Itype*)&bytes)->rd];
 					break;
 				default:
 					exception(Exception::Illegal_Instruction);
@@ -231,42 +231,42 @@ bool CPU::interpret(uint32_t* bytes) {
 			consume();
 			break;
 		case 0x6:
-			switch(((Itype*)bytes)->funct3) {
+			switch(((Itype*)&bytes)->funct3) {
 				case 0b000:
-					regs.x[((Itype*)bytes)->rd]
-						= sign_extend32(regs.x[((Itype*)bytes)->rs1] + sign_extend12(((Itype*)bytes)->imm));
+					regs.x[((Itype*)&bytes)->rd]
+						= sign_extend32(regs.x[((Itype*)&bytes)->rs1] + sign_extend12(((Itype*)&bytes)->imm));
 					if constexpr (DBG_MATH)
-					dbg() << "addiw x[" << ((Itype*)bytes)->rd << "] + "
-						<< sign_extend12(((Itype*)bytes)->imm) << " = "
-						<< regs.x[((Itype*)bytes)->rd];
+					dbg() << "addiw x[" << ((Itype*)&bytes)->rd << "] + "
+						<< sign_extend12(((Itype*)&bytes)->imm) << " = "
+						<< regs.x[((Itype*)&bytes)->rd];
 					break;
 				case 0b001:
-					regs.x[((SHIFTtype*)bytes)->rd]
-						= sign_extend32(regs.x[((SHIFTtype*)bytes)->rs1] << sign_extend12(((SHIFTtype*)bytes)->shamt));
+					regs.x[((SHIFTtype*)&bytes)->rd]
+						= sign_extend32(regs.x[((SHIFTtype*)&bytes)->rs1] << sign_extend12(((SHIFTtype*)&bytes)->shamt));
 					if constexpr (DBG_MATH)
-					dbg() << "slliw x[" << ((SHIFTtype*)bytes)->rd << "] << "
-						<< sign_extend12(((SHIFTtype*)bytes)->shamt) << " = "
-						<< regs.x[((SHIFTtype*)bytes)->rd];
+					dbg() << "slliw x[" << ((SHIFTtype*)&bytes)->rd << "] << "
+						<< sign_extend12(((SHIFTtype*)&bytes)->shamt) << " = "
+						<< regs.x[((SHIFTtype*)&bytes)->rd];
 					break;
 				case 0b101:
-					switch (((SHIFTtype*)bytes)->type) {
+					switch (((SHIFTtype*)&bytes)->type) {
 						case 0b0000000:
-							regs.x[((SHIFTtype*)bytes)->rd]
-								= sign_extend32(regs.x[((SHIFTtype*)bytes)->rs1] >> sign_extend12(((SHIFTtype*)bytes)->shamt));
+							regs.x[((SHIFTtype*)&bytes)->rd]
+								= sign_extend32(regs.x[((SHIFTtype*)&bytes)->rs1] >> sign_extend12(((SHIFTtype*)&bytes)->shamt));
 							if constexpr (DBG_MATH)
-							dbg() << "srliw x[" << ((SHIFTtype*)bytes)->rd << "] >>l "
-								<< sign_extend12(((SHIFTtype*)bytes)->shamt) << " = "
-								<< regs.x[((SHIFTtype*)bytes)->rd];
+							dbg() << "srliw x[" << ((SHIFTtype*)&bytes)->rd << "] >>l "
+								<< sign_extend12(((SHIFTtype*)&bytes)->shamt) << " = "
+								<< regs.x[((SHIFTtype*)&bytes)->rd];
 							break;
 						case 0b0010000:
-							regs.x[((SHIFTtype*)bytes)->rd]
+							regs.x[((SHIFTtype*)&bytes)->rd]
 								= sign_extend32(arithmetic_right_shift
-								(regs.x[((SHIFTtype*)bytes)->rs1]
-								 ,  sign_extend12(((SHIFTtype*)bytes)->shamt)));
+								(regs.x[((SHIFTtype*)&bytes)->rs1]
+								 ,  sign_extend12(((SHIFTtype*)&bytes)->shamt)));
 							if constexpr (DBG_MATH)
-							dbg() << "sraiw x[" << ((SHIFTtype*)bytes)->rd << "] >>a "
-								<< sign_extend12(((SHIFTtype*)bytes)->shamt) << " = "
-								<< regs.x[((SHIFTtype*)bytes)->rd];
+							dbg() << "sraiw x[" << ((SHIFTtype*)&bytes)->rd << "] >>a "
+								<< sign_extend12(((SHIFTtype*)&bytes)->shamt) << " = "
+								<< regs.x[((SHIFTtype*)&bytes)->rd];
 							break;
 						default:
 							exception(Exception::Illegal_Instruction);
@@ -281,46 +281,46 @@ bool CPU::interpret(uint32_t* bytes) {
 			break;
 		case 0x8:
 
-			switch(((Stype*)bytes)->funct3) {
+			switch(((Stype*)&bytes)->funct3) {
 				case 0b000:
 					if constexpr (DBG_STORE)
-					dbg() << "sb " << translate_addr(sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1) + regs.x[((Stype*)bytes)->rs1]) << " = "
-						<< ((Stype*)bytes)->rs2 << '(' << regs.x[((Stype*)bytes)->rs2] << ')';
-					memory->write8(translate_addr(regs.x[((Stype*)bytes)->rs1] 
-							+ sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1))
-							, regs.x[((Stype*)bytes)->rs2] & 0xFF);
+					dbg() << "sb " << translate_addr(sign_extend12((((Stype*)&bytes)->imm2 << 5)
+							| ((Stype*)&bytes)->imm1) + regs.x[((Stype*)&bytes)->rs1]) << " = "
+						<< ((Stype*)&bytes)->rs2 << '(' << regs.x[((Stype*)&bytes)->rs2] << ')';
+					memory->write8(translate_addr(regs.x[((Stype*)&bytes)->rs1] 
+							+ sign_extend12((((Stype*)&bytes)->imm2 << 5)
+							| ((Stype*)&bytes)->imm1))
+							, regs.x[((Stype*)&bytes)->rs2] & 0xFF);
 					break;
 				case 0b001:
 					if constexpr (DBG_STORE)
-					dbg() << "sh " << translate_addr(sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1) + regs.x[((Stype*)bytes)->rs1]) << " = "
-						<< regs.x[((Stype*)bytes)->rs2 & 0xFFFF];
-					memory->write16(translate_addr(regs.x[((Stype*)bytes)->rs1]
-							+ sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1))
-							, regs.x[((Stype*)bytes)->rs2]);
+					dbg() << "sh " << translate_addr(sign_extend12((((Stype*)&bytes)->imm2 << 5)
+							| ((Stype*)&bytes)->imm1) + regs.x[((Stype*)&bytes)->rs1]) << " = "
+						<< regs.x[((Stype*)&bytes)->rs2 & 0xFFFF];
+					memory->write16(translate_addr(regs.x[((Stype*)&bytes)->rs1]
+							+ sign_extend12((((Stype*)&bytes)->imm2 << 5)
+							| ((Stype*)&bytes)->imm1))
+							, regs.x[((Stype*)&bytes)->rs2]);
 					break;
 				case 0b010:
 					if constexpr (DBG_STORE)
-					dbg() << "sw " << translate_addr(sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1) + regs.x[((Stype*)bytes)->rs1]) << " = "
-						<< regs.x[((Stype*)bytes)->rs2 & 0xFFFFFFFF];
-					memory->write32(translate_addr(regs.x[((Stype*)bytes)->rs1]
-							+ sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1))
-							, regs.x[((Stype*)bytes)->rs2]);
+					dbg() << "sw " << translate_addr(sign_extend12((((Stype*)&bytes)->imm2 << 5)
+							| ((Stype*)&bytes)->imm1) + regs.x[((Stype*)&bytes)->rs1]) << " = "
+						<< regs.x[((Stype*)&bytes)->rs2 & 0xFFFFFFFF];
+					memory->write32(translate_addr(regs.x[((Stype*)&bytes)->rs1]
+							+ sign_extend12((((Stype*)&bytes)->imm2 << 5)
+							| ((Stype*)&bytes)->imm1))
+							, regs.x[((Stype*)&bytes)->rs2]);
 					break;
 				case 0b011:
 					if constexpr (DBG_STORE)
-					dbg() << "sd " << translate_addr(sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1) + regs.x[((Stype*)bytes)->rs1]) << " = "
-						<< regs.x[((Stype*)bytes)->rs2];
-					memory->write64(translate_addr(regs.x[((Stype*)bytes)->rs1]
-							+ sign_extend12((((Stype*)bytes)->imm2 << 5)
-							| ((Stype*)bytes)->imm1))
-							, regs.x[((Stype*)bytes)->rs2]);
+					dbg() << "sd " << translate_addr(sign_extend12((((Stype*)&bytes)->imm2 << 5)
+							| ((Stype*)&bytes)->imm1) + regs.x[((Stype*)&bytes)->rs1]) << " = "
+						<< regs.x[((Stype*)&bytes)->rs2];
+					memory->write64(translate_addr(regs.x[((Stype*)&bytes)->rs1]
+							+ sign_extend12((((Stype*)&bytes)->imm2 << 5)
+							| ((Stype*)&bytes)->imm1))
+							, regs.x[((Stype*)&bytes)->rs2]);
 					break;
 				default:
 					exception(Exception::Illegal_Instruction);
@@ -330,26 +330,26 @@ bool CPU::interpret(uint32_t* bytes) {
 			break;
 		case 0x5:
 			if constexpr (DBG_LOAD)
-			dbg() << "auipc x[" << ((Utype*)bytes)->rd << "] = pc + "
-				<< sign_extend32(((Utype*)bytes)->imm << 12);
-			regs.x[((Utype*)bytes)->rd] = regs.pc + sign_extend32(((Utype*)bytes)->imm << 12);
+			dbg() << "auipc x[" << ((Utype*)&bytes)->rd << "] = pc + "
+				<< sign_extend32(((Utype*)&bytes)->imm << 12);
+			regs.x[((Utype*)&bytes)->rd] = regs.pc + sign_extend32(((Utype*)&bytes)->imm << 12);
 			consume();
 			break;
 		case 0xB:
-			switch (((AMOtype*)bytes)->funct3) {
+			switch (((AMOtype*)&bytes)->funct3) {
 				case 0b010:
-					switch (((AMOtype*)bytes)->funct5) {
+					switch (((AMOtype*)&bytes)->funct5) {
 						case 0b1: {
-								  uint32_t t = (int32_t)memory->read32(translate_addr(regs.x[((AMOtype*)bytes)->rs1]));
-								  memory->write32(translate_addr(regs.x[((AMOtype*)bytes)->rs1])
-										  , regs.x[((AMOtype*)bytes)->rs2]);
-								  regs.x[((AMOtype*)bytes)->rs2] = t;
+								  uint32_t t = (int32_t)memory->read32(translate_addr(regs.x[((AMOtype*)&bytes)->rs1]));
+								  memory->write32(translate_addr(regs.x[((AMOtype*)&bytes)->rs1])
+										  , regs.x[((AMOtype*)&bytes)->rs2]);
+								  regs.x[((AMOtype*)&bytes)->rs2] = t;
 								  if constexpr (DBG_AMO)
-								  dbg() << "amoswap.w x[" << ((AMOtype*)bytes)->rd << "] = "
-									  << regs.x[((AMOtype*)bytes)->rd] << " addr: "
-									  << regs.x[((AMOtype*)bytes)->rs1] << " val: "
-									  << regs.x[((AMOtype*)bytes)->rs2];
-								  regs.x[((AMOtype*)bytes)->rd] = t;
+								  dbg() << "amoswap.w x[" << ((AMOtype*)&bytes)->rd << "] = "
+									  << regs.x[((AMOtype*)&bytes)->rd] << " addr: "
+									  << regs.x[((AMOtype*)&bytes)->rs1] << " val: "
+									  << regs.x[((AMOtype*)&bytes)->rs2];
+								  regs.x[((AMOtype*)&bytes)->rd] = t;
 									  break;
 							  }
 						case 0b0:
@@ -363,41 +363,41 @@ bool CPU::interpret(uint32_t* bytes) {
 			consume();
 			break;
 		case 0xC:
-			switch (((Rtype*)bytes)->funct3) {
+			switch (((Rtype*)&bytes)->funct3) {
 				case 0b000:
-					switch (((Rtype*)bytes)->funct7) {
+					switch (((Rtype*)&bytes)->funct7) {
 						case 0b0000000:
 							if constexpr (DBG_MATH)
-							dbg() << "add x[" <<((Rtype*)bytes)->rd
-								<< "] = x[" << ((Rtype*)bytes)->rs1
-								<< "](" << regs.x[((Rtype*)bytes)->rs1]
-								<< ") + x[" << ((Rtype*)bytes)->rs2
-								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-							regs.x[((Rtype*)bytes)->rd]
-								= regs.x[((Rtype*)bytes)->rs1]
-								+ regs.x[((Rtype*)bytes)->rs2];
+							dbg() << "add x[" <<((Rtype*)&bytes)->rd
+								<< "] = x[" << ((Rtype*)&bytes)->rs1
+								<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+								<< ") + x[" << ((Rtype*)&bytes)->rs2
+								<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+							regs.x[((Rtype*)&bytes)->rd]
+								= regs.x[((Rtype*)&bytes)->rs1]
+								+ regs.x[((Rtype*)&bytes)->rs2];
 							break;
 						case 0b0100000:
 							if constexpr (DBG_MATH)
-							dbg() << "sub x[" <<((Rtype*)bytes)->rd
-								<< "] = x[" << ((Rtype*)bytes)->rs1
-								<< "](" << regs.x[((Rtype*)bytes)->rs1]
-								<< ") - x[" << ((Rtype*)bytes)->rs2
-								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-							regs.x[((Rtype*)bytes)->rd]
-								= regs.x[((Rtype*)bytes)->rs1]
-								- regs.x[((Rtype*)bytes)->rs2];
+							dbg() << "sub x[" <<((Rtype*)&bytes)->rd
+								<< "] = x[" << ((Rtype*)&bytes)->rs1
+								<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+								<< ") - x[" << ((Rtype*)&bytes)->rs2
+								<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+							regs.x[((Rtype*)&bytes)->rd]
+								= regs.x[((Rtype*)&bytes)->rs1]
+								- regs.x[((Rtype*)&bytes)->rs2];
 							break;
 						case 0b0000001:
 							if constexpr (DBG_MATH)
-							dbg() << "mul x[" <<((Rtype*)bytes)->rd
-								<< "] = x[" << ((Rtype*)bytes)->rs1
-								<< "](" << regs.x[((Rtype*)bytes)->rs1]
-								<< ") * x[" << ((Rtype*)bytes)->rs2
-								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-							regs.x[((Rtype*)bytes)->rd]
-								= (int64_t)regs.x[((Rtype*)bytes)->rs1]
-								* (int64_t)regs.x[((Rtype*)bytes)->rs2];
+							dbg() << "mul x[" <<((Rtype*)&bytes)->rd
+								<< "] = x[" << ((Rtype*)&bytes)->rs1
+								<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+								<< ") * x[" << ((Rtype*)&bytes)->rs2
+								<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+							regs.x[((Rtype*)&bytes)->rd]
+								= (int64_t)regs.x[((Rtype*)&bytes)->rs1]
+								* (int64_t)regs.x[((Rtype*)&bytes)->rs2];
 							break;
 						default:
 							exception(Exception::Illegal_Instruction);
@@ -406,71 +406,71 @@ bool CPU::interpret(uint32_t* bytes) {
 					break;
 				case 0b001:
 					if constexpr (DBG_MATH)
-					dbg() << "sll x[" <<((Rtype*)bytes)->rd
-						<< "] = x[" << ((Rtype*)bytes)->rs1
-						<< "](" << regs.x[((Rtype*)bytes)->rs1]
-						<< ") << x[" << ((Rtype*)bytes)->rs2
-						<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-					regs.x[((Rtype*)bytes)->rd]
-						= regs.x[((Rtype*)bytes)->rs1]
-						<< regs.x[((Rtype*)bytes)->rs2];
+					dbg() << "sll x[" <<((Rtype*)&bytes)->rd
+						<< "] = x[" << ((Rtype*)&bytes)->rs1
+						<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+						<< ") << x[" << ((Rtype*)&bytes)->rs2
+						<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+					regs.x[((Rtype*)&bytes)->rd]
+						= regs.x[((Rtype*)&bytes)->rs1]
+						<< regs.x[((Rtype*)&bytes)->rs2];
 					break;
 				case 0b010:
 					if constexpr (DBG_MATH)
-					dbg() << "slt x[" <<((Rtype*)bytes)->rd
-						<< "] < x[" << ((Rtype*)bytes)->rs1
-						<< "](" << (int64_t)regs.x[((Rtype*)bytes)->rs1]
-						<< ") < x[" << ((Rtype*)bytes)->rs2
-						<< "](" << (int64_t)regs.x[((Rtype*)bytes)->rs2] << ")?";
-					regs.x[((Rtype*)bytes)->rd]
-						= (int64_t)regs.x[((Rtype*)bytes)->rs1]
-						< (int64_t)regs.x[((Rtype*)bytes)->rs2] ? 1 : 0;
+					dbg() << "slt x[" <<((Rtype*)&bytes)->rd
+						<< "] < x[" << ((Rtype*)&bytes)->rs1
+						<< "](" << (int64_t)regs.x[((Rtype*)&bytes)->rs1]
+						<< ") < x[" << ((Rtype*)&bytes)->rs2
+						<< "](" << (int64_t)regs.x[((Rtype*)&bytes)->rs2] << ")?";
+					regs.x[((Rtype*)&bytes)->rd]
+						= (int64_t)regs.x[((Rtype*)&bytes)->rs1]
+						< (int64_t)regs.x[((Rtype*)&bytes)->rs2] ? 1 : 0;
 					break;
 				case 0b011:
 					if constexpr (DBG_MATH)
-					dbg() << "sltu x[" <<((Rtype*)bytes)->rd
-						<< "] < x[" << ((Rtype*)bytes)->rs1
-						<< "](" << regs.x[((Rtype*)bytes)->rs1]
-						<< ") < x[" << ((Rtype*)bytes)->rs2
-						<< "](" << regs.x[((Rtype*)bytes)->rs2] << ")?";
-					regs.x[((Rtype*)bytes)->rd]
-						= regs.x[((Rtype*)bytes)->rs1]
-						< regs.x[((Rtype*)bytes)->rs2] ? 1 : 0;
+					dbg() << "sltu x[" <<((Rtype*)&bytes)->rd
+						<< "] < x[" << ((Rtype*)&bytes)->rs1
+						<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+						<< ") < x[" << ((Rtype*)&bytes)->rs2
+						<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ")?";
+					regs.x[((Rtype*)&bytes)->rd]
+						= regs.x[((Rtype*)&bytes)->rs1]
+						< regs.x[((Rtype*)&bytes)->rs2] ? 1 : 0;
 					break;
 				case 0b100:
 					if constexpr (DBG_MATH)
-					dbg() << "xor x[" <<((Rtype*)bytes)->rd
-						<< "] = x[" << ((Rtype*)bytes)->rs1
-						<< "](" << regs.x[((Rtype*)bytes)->rs1]
-						<< ") ^ x[" << ((Rtype*)bytes)->rs2
-						<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-					regs.x[((Rtype*)bytes)->rd]
-						= regs.x[((Rtype*)bytes)->rs1]
-						^ regs.x[((Rtype*)bytes)->rs2];
+					dbg() << "xor x[" <<((Rtype*)&bytes)->rd
+						<< "] = x[" << ((Rtype*)&bytes)->rs1
+						<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+						<< ") ^ x[" << ((Rtype*)&bytes)->rs2
+						<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+					regs.x[((Rtype*)&bytes)->rd]
+						= regs.x[((Rtype*)&bytes)->rs1]
+						^ regs.x[((Rtype*)&bytes)->rs2];
 					break;
 				case 0b101:
-					switch (((Rtype*)bytes)->funct7) {
+					switch (((Rtype*)&bytes)->funct7) {
 						case 0b0000000:
 							if constexpr (DBG_MATH)
-							dbg() << "srl x[" <<((Rtype*)bytes)->rd
-								<< "] = x[" << ((Rtype*)bytes)->rs1
-								<< "](" << regs.x[((Rtype*)bytes)->rs1]
-								<< ") >>l x[" << ((Rtype*)bytes)->rs2
-								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-							regs.x[((Rtype*)bytes)->rd]
-								= regs.x[((Rtype*)bytes)->rs1]
-								>> regs.x[((Rtype*)bytes)->rs2];
+							dbg() << "srl x[" <<((Rtype*)&bytes)->rd
+								<< "] = x[" << ((Rtype*)&bytes)->rs1
+								<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+								<< ") >>l x[" << ((Rtype*)&bytes)->rs2
+								<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+							regs.x[((Rtype*)&bytes)->rd]
+								= regs.x[((Rtype*)&bytes)->rs1]
+								>> regs.x[((Rtype*)&bytes)->rs2];
 							break;
 						case 0b0100000:
 							if constexpr (DBG_MATH)
-							dbg() << "sra x[" <<((Rtype*)bytes)->rd
-								<< "] = x[" << ((Rtype*)bytes)->rs1
-								<< "](" << regs.x[((Rtype*)bytes)->rs1]
-								<< ") >>a x[" << ((Rtype*)bytes)->rs2
-								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-							regs.x[((Rtype*)bytes)->rd]
-								=arithmetic_right_shift(regs.x[((Rtype*)bytes)->rs1]
-										,regs.x[((Rtype*)bytes)->rs2]);
+							dbg() << "sra x[" <<((Rtype*)&bytes)->rd
+								<< "] = x[" << ((Rtype*)&bytes)->rs1
+								<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+								<< ") >>a x[" << ((Rtype*)&bytes)->rs2
+								<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+							regs.x[((Rtype*)&bytes)->rd]
+								=arithmetic_right_shift(regs.x[((Rtype*)&bytes)->rs1]
+										,regs.x[((Rtype*)&bytes)->rs2]);
 							break;
 						default:
 							exception(Exception::Illegal_Instruction);
@@ -479,25 +479,25 @@ bool CPU::interpret(uint32_t* bytes) {
 					break;
 				case 0b110:
 					if constexpr (DBG_MATH)
-					dbg() << "or x[" <<((Rtype*)bytes)->rd
-						<< "] = x[" << ((Rtype*)bytes)->rs1
-						<< "](" << regs.x[((Rtype*)bytes)->rs1]
-						<< ") | x[" << ((Rtype*)bytes)->rs2
-						<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-					regs.x[((Rtype*)bytes)->rd]
-						= regs.x[((Rtype*)bytes)->rs1]
-						| regs.x[((Rtype*)bytes)->rs2];
+					dbg() << "or x[" <<((Rtype*)&bytes)->rd
+						<< "] = x[" << ((Rtype*)&bytes)->rs1
+						<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+						<< ") | x[" << ((Rtype*)&bytes)->rs2
+						<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+					regs.x[((Rtype*)&bytes)->rd]
+						= regs.x[((Rtype*)&bytes)->rs1]
+						| regs.x[((Rtype*)&bytes)->rs2];
 					break;
 				case 0b111:
 					if constexpr (DBG_MATH)
-					dbg() << "and x[" <<((Rtype*)bytes)->rd
-						<< "] = x[" << ((Rtype*)bytes)->rs1
-						<< "](" << regs.x[((Rtype*)bytes)->rs1]
-						<< ") & x[" << ((Rtype*)bytes)->rs2
-						<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-					regs.x[((Rtype*)bytes)->rd]
-						= regs.x[((Rtype*)bytes)->rs1]
-						& regs.x[((Rtype*)bytes)->rs2];
+					dbg() << "and x[" <<((Rtype*)&bytes)->rd
+						<< "] = x[" << ((Rtype*)&bytes)->rs1
+						<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+						<< ") & x[" << ((Rtype*)&bytes)->rs2
+						<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+					regs.x[((Rtype*)&bytes)->rd]
+						= regs.x[((Rtype*)&bytes)->rs1]
+						& regs.x[((Rtype*)&bytes)->rs2];
 					break;
 				default:
 					exception(Exception::Illegal_Instruction);
@@ -507,48 +507,48 @@ bool CPU::interpret(uint32_t* bytes) {
 			break;
 		case 0xD:
 			if constexpr (DBG_LOAD)
-			dbg() << "lui x[" << ((Utype*)bytes)->rd << "] = "
-				<< sign_extend32(((Utype*)bytes)->imm << 12);
-			regs.x[((Utype*)bytes)->rd] = sign_extend32(((Utype*)bytes)->imm << 12);
+			dbg() << "lui x[" << ((Utype*)&bytes)->rd << "] = "
+				<< sign_extend32(((Utype*)&bytes)->imm << 12);
+			regs.x[((Utype*)&bytes)->rd] = sign_extend32(((Utype*)&bytes)->imm << 12);
 			consume();
 			break;
 		case 0xE:
 			// TODO: Technically these aren't right
-			switch (((Rtype*)bytes)->funct3) {
+			switch (((Rtype*)&bytes)->funct3) {
 				case 0b000:
-					switch (((Rtype*)bytes)->funct7) {
+					switch (((Rtype*)&bytes)->funct7) {
 						case 0b0000000:
 							if constexpr (DBG_MATH)
-							dbg() << "addw x[" <<((Rtype*)bytes)->rd
-								<< "] = x[" << ((Rtype*)bytes)->rs1
-								<< "](" << regs.x[((Rtype*)bytes)->rs1]
-								<< ") + x[" << ((Rtype*)bytes)->rs2
-								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-							regs.x[((Rtype*)bytes)->rd]
-								= sign_extend32(regs.x[((Rtype*)bytes)->rs1]
-								+ regs.x[((Rtype*)bytes)->rs2]);
+							dbg() << "addw x[" <<((Rtype*)&bytes)->rd
+								<< "] = x[" << ((Rtype*)&bytes)->rs1
+								<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+								<< ") + x[" << ((Rtype*)&bytes)->rs2
+								<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+							regs.x[((Rtype*)&bytes)->rd]
+								= sign_extend32(regs.x[((Rtype*)&bytes)->rs1]
+								+ regs.x[((Rtype*)&bytes)->rs2]);
 							break;
 						case 0b0100000:
 							if constexpr (DBG_MATH)
-							dbg() << "subw x[" <<((Rtype*)bytes)->rd
-								<< "] = x[" << ((Rtype*)bytes)->rs1
-								<< "](" << regs.x[((Rtype*)bytes)->rs1]
-								<< ") - x[" << ((Rtype*)bytes)->rs2
-								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-							regs.x[((Rtype*)bytes)->rd]
-								= sign_extend32(regs.x[((Rtype*)bytes)->rs1]
-								- regs.x[((Rtype*)bytes)->rs2]);
+							dbg() << "subw x[" <<((Rtype*)&bytes)->rd
+								<< "] = x[" << ((Rtype*)&bytes)->rs1
+								<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+								<< ") - x[" << ((Rtype*)&bytes)->rs2
+								<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+							regs.x[((Rtype*)&bytes)->rd]
+								= sign_extend32(regs.x[((Rtype*)&bytes)->rs1]
+								- regs.x[((Rtype*)&bytes)->rs2]);
 							break;
 						case 0b0000001:
 							if constexpr (DBG_MATH)
-							dbg() << "mulw x[" <<((Rtype*)bytes)->rd
-								<< "] = x[" << ((Rtype*)bytes)->rs1
-								<< "](" << regs.x[((Rtype*)bytes)->rs1]
-								<< ") * x[" << ((Rtype*)bytes)->rs2
-								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-							regs.x[((Rtype*)bytes)->rd]
-								= sign_extend32((int32_t)regs.x[((Rtype*)bytes)->rs1]
-								* (int32_t)regs.x[((Rtype*)bytes)->rs2]);
+							dbg() << "mulw x[" <<((Rtype*)&bytes)->rd
+								<< "] = x[" << ((Rtype*)&bytes)->rs1
+								<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+								<< ") * x[" << ((Rtype*)&bytes)->rs2
+								<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+							regs.x[((Rtype*)&bytes)->rd]
+								= sign_extend32((int32_t)regs.x[((Rtype*)&bytes)->rs1]
+								* (int32_t)regs.x[((Rtype*)&bytes)->rs2]);
 							break;
 						default:
 							exception(Exception::Illegal_Instruction);
@@ -557,49 +557,49 @@ bool CPU::interpret(uint32_t* bytes) {
 					break;
 				case 0b001:
 					if constexpr (DBG_MATH)
-					dbg() << "sllw x[" <<((Rtype*)bytes)->rd
-						<< "] = x[" << ((Rtype*)bytes)->rs1
-						<< "](" << regs.x[((Rtype*)bytes)->rs1]
-						<< ") << x[" << ((Rtype*)bytes)->rs2
-						<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-					regs.x[((Rtype*)bytes)->rd]
-						= sign_extend32(regs.x[((Rtype*)bytes)->rs1]
-						<< regs.x[((Rtype*)bytes)->rs2]);
+					dbg() << "sllw x[" <<((Rtype*)&bytes)->rd
+						<< "] = x[" << ((Rtype*)&bytes)->rs1
+						<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+						<< ") << x[" << ((Rtype*)&bytes)->rs2
+						<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+					regs.x[((Rtype*)&bytes)->rd]
+						= sign_extend32(regs.x[((Rtype*)&bytes)->rs1]
+						<< regs.x[((Rtype*)&bytes)->rs2]);
 					break;
 				case 0b101:
-					switch (((Rtype*)bytes)->funct7) {
+					switch (((Rtype*)&bytes)->funct7) {
 						case 0b0000000:
 							if constexpr (DBG_MATH)
-							dbg() << "srlw x[" <<((Rtype*)bytes)->rd
-								<< "] = x[" << ((Rtype*)bytes)->rs1
-								<< "](" << regs.x[((Rtype*)bytes)->rs1]
-								<< ") >>l x[" << ((Rtype*)bytes)->rs2
-								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-							regs.x[((Rtype*)bytes)->rd]
-								= sign_extend32(regs.x[((Rtype*)bytes)->rs1]
-								>> regs.x[((Rtype*)bytes)->rs2]);
+							dbg() << "srlw x[" <<((Rtype*)&bytes)->rd
+								<< "] = x[" << ((Rtype*)&bytes)->rs1
+								<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+								<< ") >>l x[" << ((Rtype*)&bytes)->rs2
+								<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+							regs.x[((Rtype*)&bytes)->rd]
+								= sign_extend32(regs.x[((Rtype*)&bytes)->rs1]
+								>> regs.x[((Rtype*)&bytes)->rs2]);
 							break;
 						case 0b0100000:
 							if constexpr (DBG_MATH)
-							dbg() << "sraw x[" <<((Rtype*)bytes)->rd
-								<< "] = x[" << ((Rtype*)bytes)->rs1
-								<< "](" << regs.x[((Rtype*)bytes)->rs1]
-								<< ") >>a x[" << ((Rtype*)bytes)->rs2
-								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-							regs.x[((Rtype*)bytes)->rd]
-								= sign_extend32(arithmetic_right_shift(regs.x[((Rtype*)bytes)->rs1]
-										,regs.x[((Rtype*)bytes)->rs2]));
+							dbg() << "sraw x[" <<((Rtype*)&bytes)->rd
+								<< "] = x[" << ((Rtype*)&bytes)->rs1
+								<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+								<< ") >>a x[" << ((Rtype*)&bytes)->rs2
+								<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+							regs.x[((Rtype*)&bytes)->rd]
+								= sign_extend32(arithmetic_right_shift(regs.x[((Rtype*)&bytes)->rs1]
+										,regs.x[((Rtype*)&bytes)->rs2]));
 							break;
 						case 0b0000001:
 							if constexpr (DBG_MATH)
-							dbg() << "divuw x[" <<((Rtype*)bytes)->rd
-								<< "] = x[" << ((Rtype*)bytes)->rs1
-								<< "](" << regs.x[((Rtype*)bytes)->rs1]
-								<< ") / x[" << ((Rtype*)bytes)->rs2
-								<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-							regs.x[((Rtype*)bytes)->rd]
-								= sign_extend32((uint32_t)regs.x[((Rtype*)bytes)->rs1]
-								/ (uint32_t)regs.x[((Rtype*)bytes)->rs2]);
+							dbg() << "divuw x[" <<((Rtype*)&bytes)->rd
+								<< "] = x[" << ((Rtype*)&bytes)->rs1
+								<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+								<< ") / x[" << ((Rtype*)&bytes)->rs2
+								<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+							regs.x[((Rtype*)&bytes)->rd]
+								= sign_extend32((uint32_t)regs.x[((Rtype*)&bytes)->rs1]
+								/ (uint32_t)regs.x[((Rtype*)&bytes)->rs2]);
 							break;
 						default:
 							exception(Exception::Illegal_Instruction);
@@ -607,14 +607,14 @@ bool CPU::interpret(uint32_t* bytes) {
 					}
 				case 0b111:
 					if constexpr (DBG_MATH)
-						dbg() << "remuw x[" <<((Rtype*)bytes)->rd
-					<< "] = x[" << ((Rtype*)bytes)->rs1
-					<< "](" << regs.x[((Rtype*)bytes)->rs1]
-					<< ") % x[" << ((Rtype*)bytes)->rs2
-					<< "](" << regs.x[((Rtype*)bytes)->rs2] << ')';
-					regs.x[((Rtype*)bytes)->rd]
-					= sign_extend32((uint32_t)regs.x[((Rtype*)bytes)->rs1]
-						% (uint32_t)regs.x[((Rtype*)bytes)->rs2]);
+						dbg() << "remuw x[" <<((Rtype*)&bytes)->rd
+					<< "] = x[" << ((Rtype*)&bytes)->rs1
+					<< "](" << regs.x[((Rtype*)&bytes)->rs1]
+					<< ") % x[" << ((Rtype*)&bytes)->rs2
+					<< "](" << regs.x[((Rtype*)&bytes)->rs2] << ')';
+					regs.x[((Rtype*)&bytes)->rd]
+					= sign_extend32((uint32_t)regs.x[((Rtype*)&bytes)->rs1]
+						% (uint32_t)regs.x[((Rtype*)&bytes)->rs2]);
 					break;
 				default:
 					exception(Exception::Illegal_Instruction);
@@ -623,20 +623,19 @@ bool CPU::interpret(uint32_t* bytes) {
 			consume();
 			break;
 		case 0x18: {
-			switch (((Btype*)bytes)->funct3) {
+			switch (((Btype*)&bytes)->funct3) {
 				case 0b000: {
-					if (regs.x[((Btype*)bytes)->rs1] == regs.x[((Btype*)bytes)->rs2]) {
-						regs.pc += sign_extend12(((Btype*)bytes)->imm1 << 10
-							| ((Btype*)bytes)->imm2 << 1
-							| ((Btype*)bytes)->imm3 << 5
-							| ((Btype*)bytes)->imm4 << 11);
+					if (regs.x[((Btype*)&bytes)->rs1] == regs.x[((Btype*)&bytes)->rs2]) {
+						regs.pc += sign_extend12(((Btype*)&bytes)->imm1 << 10
+							| ((Btype*)&bytes)->imm2 << 1
+							| ((Btype*)&bytes)->imm3 << 5
+							| ((Btype*)&bytes)->imm4 << 11);
 						if constexpr (DBG_COMP)
-						dbg() << "beq x[" << ((Btype*)bytes)->rs1 << "]("
-							<< regs.x[((Btype*)bytes)->rs1] 
-							<< ") == x[" << ((Btype*)bytes)->rs2 << "]("
-							<< regs.x[((Btype*)bytes)->rs2]
+						dbg() << "beq x[" << ((Btype*)&bytes)->rs1 << "]("
+							<< regs.x[((Btype*)&bytes)->rs1] 
+							<< ") == x[" << ((Btype*)&bytes)->rs2 << "]("
+							<< regs.x[((Btype*)&bytes)->rs2]
 							<< ") ? returned true, jumping to " << regs.pc;
-						index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
 						return 0;
 					} else {
 						if constexpr (DBG_COMP)
@@ -646,18 +645,17 @@ bool CPU::interpret(uint32_t* bytes) {
 					break;
 					    }
 				case 0b001:
-					if (regs.x[((Btype*)bytes)->rs1] != regs.x[((Btype*)bytes)->rs2]) {
-						regs.pc += sign_extend12(((Btype*)bytes)->imm1 << 10
-							| ((Btype*)bytes)->imm2 << 1
-							| ((Btype*)bytes)->imm3 << 5
-							| ((Btype*)bytes)->imm4 << 11);
+					if (regs.x[((Btype*)&bytes)->rs1] != regs.x[((Btype*)&bytes)->rs2]) {
+						regs.pc += sign_extend12(((Btype*)&bytes)->imm1 << 10
+							| ((Btype*)&bytes)->imm2 << 1
+							| ((Btype*)&bytes)->imm3 << 5
+							| ((Btype*)&bytes)->imm4 << 11);
 						if constexpr (DBG_COMP)
-						dbg() << "bne x[" << ((Btype*)bytes)->rs1 << "]("
-							<< regs.x[((Btype*)bytes)->rs1] 
-							<< ") != x[" << ((Btype*)bytes)->rs2 << "]("
-							<< regs.x[((Btype*)bytes)->rs2]
+						dbg() << "bne x[" << ((Btype*)&bytes)->rs1 << "]("
+							<< regs.x[((Btype*)&bytes)->rs1] 
+							<< ") != x[" << ((Btype*)&bytes)->rs2 << "]("
+							<< regs.x[((Btype*)&bytes)->rs2]
 							<< ") ? returned true, jumping to " << regs.pc;
-						index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
 					} else {
 						if constexpr (DBG_COMP)
 							dbg() << "bne false";
@@ -665,18 +663,17 @@ bool CPU::interpret(uint32_t* bytes) {
 					}
 					break;
 				case 0b100:
-					if ((int64_t)regs.x[((Btype*)bytes)->rs1] < (int64_t)regs.x[((Btype*)bytes)->rs2]) {
-						regs.pc += sign_extend12(((Btype*)bytes)->imm1 << 10
-							| ((Btype*)bytes)->imm2 << 1
-							| ((Btype*)bytes)->imm3 << 5
-							| ((Btype*)bytes)->imm4 << 11);
+					if ((int64_t)regs.x[((Btype*)&bytes)->rs1] < (int64_t)regs.x[((Btype*)&bytes)->rs2]) {
+						regs.pc += sign_extend12(((Btype*)&bytes)->imm1 << 10
+							| ((Btype*)&bytes)->imm2 << 1
+							| ((Btype*)&bytes)->imm3 << 5
+							| ((Btype*)&bytes)->imm4 << 11);
 						if constexpr (DBG_COMP)
-						dbg() << "blt x[" << ((Btype*)bytes)->rs1 << "]("
-							<< regs.x[((Btype*)bytes)->rs1] 
-							<< ") < x[" << ((Btype*)bytes)->rs2 << "]("
-							<< regs.x[((Btype*)bytes)->rs2]
+						dbg() << "blt x[" << ((Btype*)&bytes)->rs1 << "]("
+							<< regs.x[((Btype*)&bytes)->rs1] 
+							<< ") < x[" << ((Btype*)&bytes)->rs2 << "]("
+							<< regs.x[((Btype*)&bytes)->rs2]
 							<< ") ? returned true, jumping to " << regs.pc;
-						index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
 					} else {
 						if constexpr (DBG_COMP)
 							dbg() << "blt false";
@@ -684,18 +681,17 @@ bool CPU::interpret(uint32_t* bytes) {
 					}
 					break;
 				case 0b101:
-					if ((int64_t)regs.x[((Btype*)bytes)->rs1] >= (int64_t)regs.x[((Btype*)bytes)->rs2]) {
-						regs.pc += sign_extend12(((Btype*)bytes)->imm1 << 10
-							| ((Btype*)bytes)->imm2 << 1
-							| ((Btype*)bytes)->imm3 << 5
-							| ((Btype*)bytes)->imm4 << 11);
+					if ((int64_t)regs.x[((Btype*)&bytes)->rs1] >= (int64_t)regs.x[((Btype*)&bytes)->rs2]) {
+						regs.pc += sign_extend12(((Btype*)&bytes)->imm1 << 10
+							| ((Btype*)&bytes)->imm2 << 1
+							| ((Btype*)&bytes)->imm3 << 5
+							| ((Btype*)&bytes)->imm4 << 11);
 						if constexpr (DBG_COMP)
-						dbg() << "bge x[" << ((Btype*)bytes)->rs1 << "]("
-							<< regs.x[((Btype*)bytes)->rs1] 
-							<< ") >= x[" << ((Btype*)bytes)->rs2 << "]("
-							<< regs.x[((Btype*)bytes)->rs2]
+						dbg() << "bge x[" << ((Btype*)&bytes)->rs1 << "]("
+							<< regs.x[((Btype*)&bytes)->rs1] 
+							<< ") >= x[" << ((Btype*)&bytes)->rs2 << "]("
+							<< regs.x[((Btype*)&bytes)->rs2]
 							<< ") ? returned true, jumping to " << regs.pc;
-						index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
 					} else {
 						if constexpr (DBG_COMP)
 							dbg() << "bge false";
@@ -703,18 +699,17 @@ bool CPU::interpret(uint32_t* bytes) {
 					}
 					break;
 				case 0b110:
-					if (regs.x[((Btype*)bytes)->rs1] < regs.x[((Btype*)bytes)->rs2]) {
-						regs.pc += sign_extend12(((Btype*)bytes)->imm1 << 10
-							| ((Btype*)bytes)->imm2 << 1
-							| ((Btype*)bytes)->imm3 << 5
-							| ((Btype*)bytes)->imm4 << 11);
+					if (regs.x[((Btype*)&bytes)->rs1] < regs.x[((Btype*)&bytes)->rs2]) {
+						regs.pc += sign_extend12(((Btype*)&bytes)->imm1 << 10
+							| ((Btype*)&bytes)->imm2 << 1
+							| ((Btype*)&bytes)->imm3 << 5
+							| ((Btype*)&bytes)->imm4 << 11);
 						if constexpr (DBG_COMP)
-						dbg() << "bltu x[" << ((Btype*)bytes)->rs1 << "]("
-							<< regs.x[((Btype*)bytes)->rs1] 
-							<< ") < x[" << ((Btype*)bytes)->rs2 << "]("
-							<< regs.x[((Btype*)bytes)->rs2]
+						dbg() << "bltu x[" << ((Btype*)&bytes)->rs1 << "]("
+							<< regs.x[((Btype*)&bytes)->rs1] 
+							<< ") < x[" << ((Btype*)&bytes)->rs2 << "]("
+							<< regs.x[((Btype*)&bytes)->rs2]
 							<< ") ? returned true, jumping to " << regs.pc;
-						index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
 					} else {
 						if constexpr (DBG_COMP)
 							dbg() << "bltu false";
@@ -722,18 +717,17 @@ bool CPU::interpret(uint32_t* bytes) {
 					}
 					break;
 				case 0b111:
-					if (regs.x[((Btype*)bytes)->rs1] >= regs.x[((Btype*)bytes)->rs2]) {
-						regs.pc += sign_extend12(((Btype*)bytes)->imm1 << 10
-							| ((Btype*)bytes)->imm2 << 1
-							| ((Btype*)bytes)->imm3 << 5
-							| ((Btype*)bytes)->imm4 << 11);
+					if (regs.x[((Btype*)&bytes)->rs1] >= regs.x[((Btype*)&bytes)->rs2]) {
+						regs.pc += sign_extend12(((Btype*)&bytes)->imm1 << 10
+							| ((Btype*)&bytes)->imm2 << 1
+							| ((Btype*)&bytes)->imm3 << 5
+							| ((Btype*)&bytes)->imm4 << 11);
 						if constexpr (DBG_COMP)
-						dbg() << "bgeu x[" << ((Btype*)bytes)->rs1 << "]("
-							<< regs.x[((Btype*)bytes)->rs1] 
-							<< ") >= x[" << ((Btype*)bytes)->rs2 << "]("
-							<< regs.x[((Btype*)bytes)->rs2]
+						dbg() << "bgeu x[" << ((Btype*)&bytes)->rs1 << "]("
+							<< regs.x[((Btype*)&bytes)->rs1] 
+							<< ") >= x[" << ((Btype*)&bytes)->rs2 << "]("
+							<< regs.x[((Btype*)&bytes)->rs2]
 							<< ") ? returned true, jumping to " << regs.pc;
-						index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
 					} else {
 						if constexpr (DBG_COMP)
 							dbg() << "bgeu false";
@@ -748,34 +742,30 @@ bool CPU::interpret(uint32_t* bytes) {
 			   }
 		case 0x19: {
 				   if constexpr (DBG_JUMP)
-				   dbg() << "jalr through " << ((Itype*)bytes)->rs1 << " to "
-					   << ((regs.x[((Itype*)bytes)->rs1]
-							   + sign_extend12(((Itype*)bytes)->imm)) & ~1);
+				   dbg() << "jalr through " << ((Itype*)&bytes)->rs1 << " to "
+					   << ((regs.x[((Itype*)&bytes)->rs1]
+							   + sign_extend12(((Itype*)&bytes)->imm)) & ~1);
 				   uint64_t t = regs.pc + 4;
-				   regs.pc = (regs.x[((Itype*)bytes)->rs1]
-						   + sign_extend12(((Itype*)bytes)->imm)) & ~1;
-				   index = (((regs.x[((Itype*)bytes)->rs1]
-						   + sign_extend12(((Itype*)bytes)->imm)) & ~1)
-						   - Memory::MEM_START) / 4 + Memory::MEM_START;
-				   regs.x[((Itype*)bytes)->rd] = t;
+				   regs.pc = (regs.x[((Itype*)&bytes)->rs1]
+						   + sign_extend12(((Itype*)&bytes)->imm)) & ~1;
+				   regs.x[((Itype*)&bytes)->rd] = t;
 				   return 0;
 			   }
 		case 0x1B:  {
-				    regs.pc += sign_extend20(((Jtype*)bytes)->imm4 << 19
-						    | ((Jtype*)bytes)->imm3 << 1
-						    | ((Jtype*)bytes)->imm2 << 10
-						    | ((Jtype*)bytes)->imm1 << 11);
+				    regs.pc += sign_extend20(((Jtype*)&bytes)->imm4 << 19
+						    | ((Jtype*)&bytes)->imm3 << 1
+						    | ((Jtype*)&bytes)->imm2 << 10
+						    | ((Jtype*)&bytes)->imm1 << 11);
 				   if constexpr (DBG_JUMP)
 				    dbg() << "jal to " << regs.pc;
-				    index = (regs.pc - Memory::MEM_START) / 4 + Memory::MEM_START;
 				    return 0;
 
 			    }
 		case 0x1C:
-			switch(((Itype*)bytes)->funct3) {
+			switch(((Itype*)&bytes)->funct3) {
 				case 0b000: {
-						    //dbg() << ((Instruction*)bytes)->data;
-						    switch (((Instruction*)bytes)->data) {
+						    //dbg() << ((Instruction*)&bytes)->data;
+						    switch (((Instruction*)&bytes)->data) {
 							    case 0x240000: // sfence.vma
 							    	break;
 							    case 0x20A000:
@@ -799,72 +789,72 @@ bool CPU::interpret(uint32_t* bytes) {
 					    }
 				case 0b001: {
 						    //TODO: CHECK IF YOU'RE ALLOWED TO READ THE CSR
-						    uint64_t t = csrs.get_csr(((Itype*)bytes)->imm);
-						    csrs.set_csr(((Itype*)bytes)->imm, regs.x[((Itype*)bytes)->rs1]);
-						    regs.x[((Itype*)bytes)->rd] = t;
+						    uint64_t t = csrs.get_csr(((Itype*)&bytes)->imm);
+						    csrs.set_csr(((Itype*)&bytes)->imm, regs.x[((Itype*)&bytes)->rs1]);
+						    regs.x[((Itype*)&bytes)->rd] = t;
 						    if constexpr (DBG_CSR)
-						    dbg() << "csrrw csr[" << ((Itype*)bytes)->imm
-							    << "] = " << csrs.get_csr(((Itype*)bytes)->imm)
-							    << " with rd = " << ((Itype*)bytes)->rd;
+						    dbg() << "csrrw csr[" << ((Itype*)&bytes)->imm
+							    << "] = " << csrs.get_csr(((Itype*)&bytes)->imm)
+							    << " with rd = " << ((Itype*)&bytes)->rd;
 						    consume();
 						    break;
 					    }
 				case 0b010: {
 						    //TODO: CHECK IF YOU'RE ALLOWED TO READ THE CSR
-						    uint64_t t = csrs.get_csr(((Itype*)bytes)->imm);
-						    csrs.set_csr(((Itype*)bytes)->imm, t | regs.x[((Itype*)bytes)->rs1]);
-						    regs.x[((Itype*)bytes)->rd] = t;
+						    uint64_t t = csrs.get_csr(((Itype*)&bytes)->imm);
+						    csrs.set_csr(((Itype*)&bytes)->imm, t | regs.x[((Itype*)&bytes)->rs1]);
+						    regs.x[((Itype*)&bytes)->rd] = t;
 						    if constexpr (DBG_CSR)
-						    dbg() << "csrrs csr[" << ((Itype*)bytes)->imm
-							    << "] = " << csrs.get_csr(((Itype*)bytes)->imm)
-							    << " with rd = " << ((Itype*)bytes)->rd;
+						    dbg() << "csrrs csr[" << ((Itype*)&bytes)->imm
+							    << "] = " << csrs.get_csr(((Itype*)&bytes)->imm)
+							    << " with rd = " << ((Itype*)&bytes)->rd;
 						    consume();
 						    break;
 					    }
 				case 0b011: {
 						    //TODO: CHECK IF YOU'RE ALLOWED TO READ THE CSR
-						    uint64_t t = csrs.get_csr(((Itype*)bytes)->imm);
-						    csrs.set_csr(((Itype*)bytes)->imm, t & ~regs.x[((Itype*)bytes)->rs1]);
-						    regs.x[((Itype*)bytes)->rd] = t;
+						    uint64_t t = csrs.get_csr(((Itype*)&bytes)->imm);
+						    csrs.set_csr(((Itype*)&bytes)->imm, t & ~regs.x[((Itype*)&bytes)->rs1]);
+						    regs.x[((Itype*)&bytes)->rd] = t;
 						    if constexpr (DBG_CSR)
-						    dbg() << "csrrc csr[" << ((Itype*)bytes)->imm
-							    << "] = " << csrs.get_csr(((Itype*)bytes)->imm)
-							    << " with rd = " << ((Itype*)bytes)->rd;
+						    dbg() << "csrrc csr[" << ((Itype*)&bytes)->imm
+							    << "] = " << csrs.get_csr(((Itype*)&bytes)->imm)
+							    << " with rd = " << ((Itype*)&bytes)->rd;
 						    consume();
 						    break;
 					    }
 				case 0b101: {
 						    //TODO: CHECK IF YOU'RE ALLOWED TO READ THE CSR
-						    csrs.set_csr(((Itype*)bytes)->imm, (uint64_t)((Itype*)bytes)->rs1);
-						    regs.x[((Itype*)bytes)->rd] = csrs.get_csr(((Itype*)bytes)->imm);
+						    csrs.set_csr(((Itype*)&bytes)->imm, (uint64_t)((Itype*)&bytes)->rs1);
+						    regs.x[((Itype*)&bytes)->rd] = csrs.get_csr(((Itype*)&bytes)->imm);
 						    if constexpr (DBG_CSR)
-						    dbg() << "csrrwi csr[" << ((Itype*)bytes)->imm
-							    << "] = " << csrs.get_csr(((Itype*)bytes)->imm)
-							    << " with rd = " << ((Itype*)bytes)->rd;
+						    dbg() << "csrrwi csr[" << ((Itype*)&bytes)->imm
+							    << "] = " << csrs.get_csr(((Itype*)&bytes)->imm)
+							    << " with rd = " << ((Itype*)&bytes)->rd;
 						    consume();
 						    break;
 					    }
 				case 0b110: {
 						    //TODO: CHECK IF YOU'RE ALLOWED TO READ THE CSR
-						    uint64_t t = csrs.get_csr(((Itype*)bytes)->imm);
-						    csrs.set_csr(((Itype*)bytes)->imm, t | (uint64_t)((Itype*)bytes)->rs1);
-						    regs.x[((Itype*)bytes)->rd] = t;
+						    uint64_t t = csrs.get_csr(((Itype*)&bytes)->imm);
+						    csrs.set_csr(((Itype*)&bytes)->imm, t | (uint64_t)((Itype*)&bytes)->rs1);
+						    regs.x[((Itype*)&bytes)->rd] = t;
 						    if constexpr (DBG_CSR)
-						    dbg() << "csrrsi csr[" << ((Itype*)bytes)->imm
-							    << "] = " << csrs.get_csr(((Itype*)bytes)->imm)
-							    << " with rd = " << ((Itype*)bytes)->rd;
+						    dbg() << "csrrsi csr[" << ((Itype*)&bytes)->imm
+							    << "] = " << csrs.get_csr(((Itype*)&bytes)->imm)
+							    << " with rd = " << ((Itype*)&bytes)->rd;
 						    consume();
 						    break;
 					    }
 				case 0b111: {
 						    //TODO: CHECK IF YOU'RE ALLOWED TO READ THE CSR
-						    uint64_t t = csrs.get_csr(((Itype*)bytes)->imm);
-						    csrs.set_csr(((Itype*)bytes)->imm, t & ~(uint64_t)((Itype*)bytes)->rs1);
-						    regs.x[((Itype*)bytes)->rd] = t;
+						    uint64_t t = csrs.get_csr(((Itype*)&bytes)->imm);
+						    csrs.set_csr(((Itype*)&bytes)->imm, t & ~(uint64_t)((Itype*)&bytes)->rs1);
+						    regs.x[((Itype*)&bytes)->rd] = t;
 						    if constexpr (DBG_CSR)
-						    dbg() << "csrrci csr[" << ((Itype*)bytes)->imm
-							    << "] = " << csrs.get_csr(((Itype*)bytes)->imm)
-							    << " with rd = " << ((Itype*)bytes)->rd;
+						    dbg() << "csrrci csr[" << ((Itype*)&bytes)->imm
+							    << "] = " << csrs.get_csr(((Itype*)&bytes)->imm)
+							    << " with rd = " << ((Itype*)&bytes)->rd;
 						    consume();
 						    break;
 						}
