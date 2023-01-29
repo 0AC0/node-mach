@@ -13,7 +13,9 @@ void Memory::writeT(uint64_t addr, T value) {
 					return;
 				}
 			}
-			dbg() << "MMU: Ignoring write to: " << addr << " out of range";
+			if constexpr (DBG_MMU)
+				dbg() << "MMU: write ex: " << addr << " -> " << value;
+			exmem[addr / PAGE_SIZE][addr % PAGE_SIZE] = value;
 	}
 }
 
@@ -45,8 +47,9 @@ T Memory::readT(uint64_t addr) {
 					return d.device->handle_mmio_read(addr);
 				}
 			}
-			dbg() << "MMU: Ignoring read from: " << addr << " out of range";
-			return 0;
+			if constexpr (DBG_MMU)
+				dbg() << "MMU: read ex: " << addr << " -> " << exmem[addr / PAGE_SIZE][addr % PAGE_SIZE];
+			return exmem[addr / PAGE_SIZE][addr % PAGE_SIZE];
 	}
 }
 
@@ -56,10 +59,6 @@ uint8_t Memory::read8(uint64_t addr) {
 
 uint16_t Memory::read16(uint64_t addr) {
 	return readT<uint16_t>(addr);
-}
-
-uint32_t* Memory::read_instruction(uint64_t addr) {
-	return &((uint32_t*)&mem)[addr - MEM_START];
 }
 
 uint32_t Memory::read32(uint64_t addr) {

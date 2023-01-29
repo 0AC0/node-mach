@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include <stdint.h>
 #include "../dbg/dbg.hpp"
 #include "../devices/device.hpp"
@@ -14,6 +15,7 @@ class Memory {
 		template <typename T> T readT(uint64_t addr);
 		template <typename T> void writeT(uint64_t addr, T value);
 		uint8_t mem[MEM_SIZE];
+		std::map<uint32_t, uint8_t[PAGE_SIZE]> exmem;
 	public:
 		void write8(uint64_t addr, uint8_t value);
 		void write16(uint64_t addr, uint16_t value);
